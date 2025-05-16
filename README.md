@@ -1,7 +1,4 @@
 # FindYourProgram
-PRJ566
-
-# FindYourProgram
 
 **FindYourProgram** is a centralized platform that helps domestic and international students find university programs best suited to their goals. 
 Our system streamlines the search and comparison process by using AI-driven personalized recommendations.
