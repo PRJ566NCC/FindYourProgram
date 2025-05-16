@@ -32,7 +32,7 @@ FindYourProgram/
 ├── backend/ # Backend API server
 ├── data/ # Sample university/program data
 └── README.md
-
+```
 
 ## Team: Binary Brains
 
