@@ -25,6 +25,7 @@ FindYourProgram solves this by providing a single platform that consolidates and
 ---
 
 ## Folder Structure
+```text
 FindYourProgram/
 ├── docs/ # Business proposal, meeting notes, planning docs
 ├── frontend/ # Frontend application
