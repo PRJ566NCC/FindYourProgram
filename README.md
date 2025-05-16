@@ -36,12 +36,12 @@ FindYourProgram/
 
 ## Team: Binary Brains
 
-| Name                        | Role             |
-|-----------------------------|------------------|
-| Farbod Moayeri              |                  |
-| Ifaz Hassan                 |                  |
-| Steven Hur                  |                  |
-| Nishita Mukeshbai Waghela   |                  |
+| Name                         | Role             |
+|------------------------------|------------------|
+| Farbod Moayeri               |                  |
+| Ifaz Hassan                  |                  |
+| Steven Hur                   |                  |
+| Nishita Mukeshbhai Waghela   |                  |
 
 ---
 
