@@ -39,6 +39,7 @@ FindYourProgram/
 | Ifaz Hassan                  |                  |
 | Steven Hur                   |                  |
 | Nishita Mukeshbhai Waghela   |                  |
+| Xuesong Zhou                 |                  |
 
 ---
 
