@@ -26,7 +26,7 @@ export default function Login() {
         setError('');
 
         if (!formData.username || !formData.password) {
-            setError('Please enter both username and password.');
+            setError('Please enter both a username and a password.');
             return;
         }
 

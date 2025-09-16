@@ -1,171 +1,225 @@
 "use client";
-import { useState } from 'react';
-import Navbar from '@/components/Navbar.js';
-import styles from '../globals.module.css';
+import { useState } from "react";
+import Navbar from "@/components/Navbar.js";
+import styles from "../globals.module.css";
 
 export default function Register() {
+  const [formData, setFormData] = useState({
+    username: "",
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-    const [formData, setFormData] = useState({
-        username: '',
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-    });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+  const validateForm = () => {
+    // Username
+    if (!formData.username.trim()) {
+      setError("Username is required.");
+      return false;
+    }
+    if (formData.username.length < 3) {
+      setError("Username must be at least 3 characters long.");
+      return false;
+    }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setSuccess('');
+    // Name
+    if (!formData.name.trim()) {
+      setError("Full name is required.");
+      return false;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(formData.name)) {
+      setError("Name can only contain letters and spaces.");
+      return false;
+    }
 
-        if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match.');
-            return;
-        }
+    // Email
+    if (!formData.email.trim()) {
+      setError("Email is required.");
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      return false;
+    }
 
-        try {
-            const { confirmPassword, ...dataToSend } = formData;
+    // Password
+    if (!formData.password) {
+      setError("Password is required.");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return false;
+    }
 
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dataToSend),
-            });
+    // Confirm Password
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return false;
+    }
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to register.');
-            }
+    setError(""); // clear if valid
+    return true;
+  };
 
-            const result = await response.json();
-            setSuccess(result.message || 'Registration successful!');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
 
-            // Reset form on success - replace with redirection to main page later
-            setFormData({
-                username: '',
-                name: '',
-                email: '',
-                password: '',
-                confirmPassword: '',
-            });
+    if (!validateForm()) return;
 
-        } catch (error) {
-            setError(error.message);
-        }
-    };
+    try {
+      const { confirmPassword, ...dataToSend } = formData;
 
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
 
-    return (
-        <>
-            <Navbar/>
-            <div className={styles.background}>
-                <div>
-                    <img src='/FindYourProgramLogo.png' alt='Logo for website' className={styles.logoImage}></img>
-                </div>
-                <div className={styles.registerContainer}>
-                    <form onSubmit={handleSubmit}>
-                        {/* Username Input */}
-                        <div>
-                            <label className={styles.label} htmlFor="username">Username:</label>
-                            <br/>
-                            <input
-                                className={styles.inputGroup}
-                                id="username"
-                                name="username"
-                                type="text"
-                                required
-                                value={formData.username}
-                                onChange={handleChange}
-                            />
-                        </div>
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to register.");
+      }
 
-                        {/* Name Input */}
-                        <div>
-                            <label className={styles.label} htmlFor="name">Full Name:</label>
-                            <br/>
-                            <input
-                                className={styles.inputGroup}
-                                id="name"
-                                name="name"
-                                type="text"
-                                required
-                                value={formData.name}
-                                onChange={handleChange}
-                            />
-                        </div>
+      const result = await response.json();
+      setSuccess(result.message || "Registration successful!");
 
-                        {/* Email Input */}
-                        <div>
-                            <label className={styles.label} htmlFor="email">Email:</label>
-                            <br/>
-                            <input
-                                className={styles.inputGroup}
-                                id="email"
-                                name="email"
-                                type="email"
-                                required
-                                value={formData.email}
-                                onChange={handleChange}
-                            />
-                        </div>
+      setFormData({
+        username: "",
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-                        {/* Password Input */}
-                        <div>
-                            <label className={styles.label} htmlFor="password">Password:</label>
-                            <br/>
-                            <input
-                                className={styles.inputGroup}
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
-                        </div>
-
-                        {/* Confirm Password Input */}
-                        <div>
-                            <label className={styles.label} htmlFor="confirmPassword">Confirm Password:</label>
-                            <br/>
-                            <input
-                                className={styles.inputGroup}
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                required
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                            />
-                        </div>
-            
-                        <div className={styles.messageContainer}>
-                            {error && <p>{error}</p>}
-                            {success && <p className={styles.success}>{success}</p>}
-                        </div>
-
-                        {/* Submit Button */}
-                        <div className={styles.buttonContainer}>
-                            <button className={styles.registerButton} type="submit">
-                                Register
-                            </button>
-                        </div>
-                    </form>
-                </div>
+  return (
+    <>
+      <Navbar />
+      <div className={styles.background}>
+        <div>
+          <img
+            src="/FindYourProgramLogo.png"
+            alt="Logo for website"
+            className={styles.logoImage}
+          ></img>
+        </div>
+        <div className={styles.registerContainer}>
+          <form onSubmit={handleSubmit}>
+            {/* Username Input */}
+            <div>
+              <label className={styles.label} htmlFor="username">
+                Username:
+              </label>
+              <br />
+              <input
+                className={styles.inputGroup}
+                id="username"
+                name="username"
+                type="text"
+                value={formData.username}
+                onChange={handleChange}
+              />
             </div>
-        </>
-    )
+
+            {/* Name Input */}
+            <div>
+              <label className={styles.label} htmlFor="name">
+                Full Name:
+              </label>
+              <br />
+              <input
+                className={styles.inputGroup}
+                id="name"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Email Input */}
+            <div>
+              <label className={styles.label} htmlFor="email">
+                Email:
+              </label>
+              <br />
+              <input
+                className={styles.inputGroup}
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <label className={styles.label} htmlFor="password">
+                Password:
+              </label>
+              <br />
+              <input
+                className={styles.inputGroup}
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Confirm Password Input */}
+            <div>
+              <label className={styles.label} htmlFor="confirmPassword">
+                Confirm Password:
+              </label>
+              <br />
+              <input
+                className={styles.inputGroup}
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Messages */}
+            <div className={styles.messageContainer}>
+              {error && <p>{error}</p>}
+              {success && <p className={styles.success}>{success}</p>}
+            </div>
+
+            {/* Submit Button */}
+            <div className={styles.buttonContainer}>
+              <button className={styles.registerButton} type="submit">
+                Register
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
+  );
 }
