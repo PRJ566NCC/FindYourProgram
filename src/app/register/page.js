@@ -71,19 +71,18 @@ export default function Register() {
     return (
         <>
             <Navbar/>
-            <div>
+            <div className={styles.background}>
                 <div>
-                    <img src=''></img>
+                    <img src='/FindYourProgramLogo.png' alt='Logo for website' className={styles.logoImage}></img>
                 </div>
-                <div>
-                    <h1>Create an Account</h1>
-        
+                <div className={styles.registerContainer}>
                     <form onSubmit={handleSubmit}>
                         {/* Username Input */}
                         <div>
                             <label className={styles.label} htmlFor="username">Username:</label>
                             <br/>
                             <input
+                                className={styles.inputGroup}
                                 id="username"
                                 name="username"
                                 type="text"
@@ -96,7 +95,9 @@ export default function Register() {
                         {/* Name Input */}
                         <div>
                             <label className={styles.label} htmlFor="name">Full Name:</label>
+                            <br/>
                             <input
+                                className={styles.inputGroup}
                                 id="name"
                                 name="name"
                                 type="text"
@@ -108,50 +109,57 @@ export default function Register() {
 
                         {/* Email Input */}
                         <div>
-                            <label className={styles.label} htmlFor="email">Email Address:</label>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                />
+                            <label className={styles.label} htmlFor="email">Email:</label>
+                            <br/>
+                            <input
+                                className={styles.inputGroup}
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                value={formData.email}
+                                onChange={handleChange}
+                            />
                         </div>
 
                         {/* Password Input */}
                         <div>
                             <label className={styles.label} htmlFor="password">Password:</label>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                />
+                            <br/>
+                            <input
+                                className={styles.inputGroup}
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                value={formData.password}
+                                onChange={handleChange}
+                            />
                         </div>
 
                         {/* Confirm Password Input */}
                         <div>
                             <label className={styles.label} htmlFor="confirmPassword">Confirm Password:</label>
-                                <input
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    type="password"
-                                    required
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                />
+                            <br/>
+                            <input
+                                className={styles.inputGroup}
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                type="password"
+                                required
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                            />
                         </div>
             
-                        {/* Feedback Messages */}
-                        {error && <p>{error}</p>}
-                        {success && <p>{success}</p>}
+                        <div className={styles.messageContainer}>
+                            {error && <p>{error}</p>}
+                            {success && <p className={styles.success}>{success}</p>}
+                        </div>
 
                         {/* Submit Button */}
-                        <div>
-                            <button type="submit">
+                        <div className={styles.buttonContainer}>
+                            <button className={styles.registerButton} type="submit">
                                 Register
                             </button>
                         </div>
