@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar.js";
-import styles from "../globals.module.css";
+import styles from "@/app/globals.module.css";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,20 @@ export default function Register() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(3);
+
+  useEffect(() => {
+  if (isRedirecting && timeLeft > 0) {
+    const timerId = setTimeout(() => {
+      setTimeLeft(timeLeft - 1);
+    }, 1000); // Decrement every second
+    return () => clearTimeout(timerId); // Clean up the timer
+  } else if (isRedirecting && timeLeft === 0) {
+    router.push('/login'); // Redirect when the timer hits zero
+  }
+  }, [isRedirecting, timeLeft, router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -100,6 +115,8 @@ export default function Register() {
       const result = await response.json();
       setSuccess(result.message || "Registration successful!");
 
+      setIsRedirecting(true);
+
       setFormData({
         username: "",
         name: "",
@@ -111,6 +128,20 @@ export default function Register() {
       setError(err.message);
     }
   };
+
+  if (isRedirecting) {
+    return (
+      <>
+        <Navbar />
+        <div className={styles.background}>
+          <div className={styles.registerContainer}>
+            <h1 className={styles.label}>🎉 Registration Successful!</h1>
+            <p>You will be redirected to the login page in {timeLeft} seconds...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

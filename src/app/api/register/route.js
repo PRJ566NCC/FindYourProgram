@@ -1,6 +1,5 @@
-// app/api/register/route.js
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import { connectToDatabase } from "../../../../lib/mongodb";
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
@@ -11,20 +10,34 @@ export async function POST(req) {
     const email = (body.email || "").trim().toLowerCase();
     const password = body.password || "";
 
-    if (!username || username.length < 3) return NextResponse.json({ message: "Invalid username." }, { status: 400 });
-    if (!name) return NextResponse.json({ message: "Full name required." }, { status: 400 });
-    if (!/\S+@\S+\.\S+/.test(email)) return NextResponse.json({ message: "Invalid email." }, { status: 400 });
-    if (!password || password.length < 6) return NextResponse.json({ message: "Password too short." }, { status: 400 });
+    // Validation
+    if (!username || username.length < 3)
+      return NextResponse.json({ message: "Invalid username." }, { status: 400 });
+    if (!name)
+      return NextResponse.json({ message: "Full name required." }, { status: 400 });
+    if (!/\S+@\S+\.\S+/.test(email))
+      return NextResponse.json({ message: "Invalid email." }, { status: 400 });
+    if (!password || password.length < 6)
+      return NextResponse.json({ message: "Password too short." }, { status: 400 });
 
     const { db } = await connectToDatabase();
 
-    const existing = await db.collection("users").findOne({ $or: [{ username }, { email }] });
-    if (existing) {
-      return NextResponse.json({ message: "User already exists." }, { status: 409 });
+    // Check for existing username
+    const existingUsername = await db.collection("users").findOne({ username });
+    if (existingUsername) {
+      return NextResponse.json({ message: "Username is already taken." }, { status: 409 });
     }
-    
-    const passwordHash = await bcrypt.hash(password, 10);
 
+    // Check for existing email
+    const existingEmail = await db.collection("users").findOne({ email });
+    if (existingEmail) {
+      return NextResponse.json({ message: "Email is already in use." }, { status: 409 });
+    }
+
+    // Hash password (14 salt rounds = strong)
+    const passwordHash = await bcrypt.hash(password, 14);
+
+    // New user document
     const newUser = {
       username,
       name,
@@ -42,7 +55,10 @@ export async function POST(req) {
 
     const result = await db.collection("users").insertOne(newUser);
 
-    return NextResponse.json({ message: "Registration successful", userId: result.insertedId }, { status: 201 });
+    return NextResponse.json(
+      { message: "Registration successful", userId: result.insertedId },
+      { status: 201 }
+    );
   } catch (err) {
     console.error("Register error:", err);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
