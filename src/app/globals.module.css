@@ -5,6 +5,120 @@ html, body {
     padding: 0;
 }
 /* --------------------------------------- PAGES ---------------------------------------------------*/
+/* PAGE: Landing (after login) */
+
+.authedMain {
+  width: min(1480px, 100% - 96px);
+  margin: 3rem auto 4rem;
+  display: grid;
+  grid-template-columns: 320px minmax(820px, 1120px); 
+  gap: 40px;
+  align-items: start;
+}
+
+/* Left column logo */
+.logoCol {
+  display: flex;
+  justify-content: center;
+  padding-top: 4rem; 
+}
+
+.sideLogo {
+  width: 260px;           
+  max-width: 100%;
+  height: auto;
+}
+
+/* Right content column */
+.resultsCol {}
+
+/* Cards */
+.resultCard {
+  position: relative;
+  background: #8EE6E7;
+  border: 2px solid #5aaeb0;
+  border-radius: 20px;
+  padding: 28px 30px;
+  margin: 28px 0;
+  box-shadow: 0 1px 0 rgba(0,0,0,.25);
+  min-height: 140px;
+}
+
+.sponsoredLink {
+  position: absolute;
+  top: 16px; right: 20px;
+  font-family: 'Jetbrains Mono', monospace;
+  font-size: 1.1rem;
+  text-decoration: underline;
+  color: #2f4f58;
+}
+
+.cardTitle {
+  margin: 0 0 .8rem 0;
+  font-weight: 900;
+  font-size: 1.9rem;
+  font-family: 'Jetbrains Mono', monospace;
+}
+
+.cardMeta {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.55;
+  font-family: 'Sarabun', sans-serif;
+}
+
+
+.ctaRow {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 4rem;     
+}
+
+.primaryBtn, .secondaryBtn {
+  display: inline-block;
+  padding: 1rem 1.4rem;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  font-family: 'Jetbrains Mono', monospace;
+  border: 2px solid #000;
+  box-shadow: 0 2px 0 rgba(0,0,0,.35);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primaryBtn   { background: #3273ff; color: #fff; }
+.secondaryBtn { background: #f8edb8; color: #000; }
+
+
+
+/* PAGE: Landing (before login) */
+.landingBackground {
+  background-color: #E7DFD8;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column; 
+  justify-content: space-evenly;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.heroLogo {
+  width: clamp(180px, 24vw, 360px);
+  height: auto;
+  margin-bottom: 2rem;
+  
+}
+
+.heroText {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-family: 'Jetbrains Mono', monospace;
+  margin: 0;
+  font-size: 2rem;
+  text-align: center;
+}
+
 /* PAGE: register */
 .label {
   font-family: 'Sarabun', sans-serif;
