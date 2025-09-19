@@ -1,35 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./globals.module.css";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function Home() {
-  const [isAuthed, setIsAuthed] = useState(false);
-  const [authResolved, setAuthResolved] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/me", { cache: "no-store", credentials: "include" });
-        const data = await res.json();
-        if (mounted) setIsAuthed(!!data?.authenticated);
-      } catch {
-        if (mounted) setIsAuthed(false);
-      } finally {
-        if (mounted) setAuthResolved(true);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { isAuthed, loading } = useAuth(); // single source of truth
 
   // hold UI until auth check completes to avoid flashing wrong state
-  if (!authResolved) {
+  if (loading) {
     return (
       <>
-        <Navbar isAuthenticated={false} authResolved={false} />
+        <Navbar />
         <div className={styles.pageSkeleton}>Loading…</div>
       </>
     );
@@ -37,7 +20,7 @@ export default function Home() {
 
   return (
     <>
-      <Navbar isAuthenticated={isAuthed} authResolved />
+      <Navbar />
       {isAuthed ? <SignedInMain /> : <Landing />}
     </>
   );
