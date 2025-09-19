@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
 
   // Check login status from /api/me
   async function checkAuth() {
+		setLoading(true);
     try {
       const res = await fetch("/api/me", {
         cache: "no-store",
