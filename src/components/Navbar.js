@@ -1,18 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import styles from "@/app/globals.module.css";
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
+  const pathname = usePathname(); // re-run auth check on navigation
 
   useEffect(() => {
     let mounted = true;
     const checkAuth = async () => {
       try {
-        const res = await fetch("/api/me", { cache: "no-store" });
+        const res = await fetch("/api/me", { cache: "no-store" , credentials:"include"});
         const data = await res.json();
         if (mounted) setIsAuthenticated(!!data?.authenticated);
       } catch (err) {
@@ -24,7 +25,7 @@ export default function Navbar() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async (e) => {
     e.preventDefault();
