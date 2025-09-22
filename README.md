@@ -29,7 +29,7 @@ FindYourProgram solves this by providing a single platform that consolidates and
 | Farbod Moayeri               |                  |
 | Ifaz Hassan                  |                  |
 | Steven Hur                   |                  |
-| Elisa Rong                   |                  |
+| Elisa Chen                   |                  |
 | Xuesong Zhou                 |                  |
 
 ---
