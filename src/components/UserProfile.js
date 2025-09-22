@@ -1,21 +1,51 @@
 "use client";
 import React, { useState } from 'react';
+import { useAuth } from '@/components/AuthProvider'
 import styles from '@/app/globals.module.css';
 
 function UserProfile() {
+  const { isAuthed } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
-  const [userData, setUserData] = useState({
-    username: 'Xuesong1234',
-    name: 'Tommy Xuesong',
-    email: 'Xuesong1234@gmail.com',
-  });
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState(null);
 
-  const [formData, setFormData] = useState({ ...userData, password: '', confirmPassword: '' });
+  // fetch user profile information once when page is loaded
+  useEffect(() => {
+    // No need to fetch data if user is not logged in
+    if (!isAuthed) {
+      setLoading(false);
+      setError("Please log in to view your profile.");
+      return;
+    }
+
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/me'); // TODO: call the API
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data.');
+        }
+
+        const data = await response.json();
+        setUserData(data); // save the fetched user data
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [isAuthed]); // if there is status change in isAuthed, run this logic again
 
   const handleEditClick = () => {
-    console.log("edit clicked!")
-    setFormData({ ...userData, password: '', confirmPassword: '' });
+    if (userData) {
+      setFormData({ ...userData, password: '', confirmPassword: '' });
+    }
     setIsEditing(true); 
   };
   
@@ -40,7 +70,7 @@ function UserProfile() {
     // TODO: Call API to send the changed data to the server
     console.log("Updated data:", formData);
 
-    setUserData({
+    setUserData({ // TEMP
         username: formData.username,
         name: formData.name,
         email: formData.email,
@@ -48,6 +78,35 @@ function UserProfile() {
     
     setIsEditing(false);
   };
+
+  // show this while loading
+  if (loading) {
+    return (
+      <div className={styles.background}>
+        <div className={styles.registerContainer}>
+          <h2>Loading Profile...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  // show this if Error
+  if (error) {
+    return (
+      <div className={styles.background}>
+        <div className={styles.registerContainer}>
+          <h2>Error</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // =======FOR TEST PURPOSE: if there are no data=========
+  if (!userData) {
+      return null;
+  }
+  // ======================================================
 
   return (
     <div className={styles.background}>
