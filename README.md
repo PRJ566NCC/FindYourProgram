@@ -12,24 +12,15 @@ FindYourProgram solves this by providing a single platform that consolidates and
 
 ---
 
-## Technologies (planned)
-- **Frontend**: (TBD)
-- **Backend**: (TBD)
+## Technologies
+- **Frontend**: React
+- **Backend**: Next.js (API)
 - **Database**: Graph Database
 - **AI/ML**: Python
 - **Search Engine**: Elasticsearch
 
 ---
 
-## Folder Structure
-```text
-FindYourProgram/
-├── docs/ # Business proposal, meeting notes, planning docs
-├── frontend/ # Frontend application
-├── backend/ # Backend API server
-├── data/ # Sample university/program data
-└── README.md
-```
 
 ## Team: Binary Brains
 
@@ -38,7 +29,7 @@ FindYourProgram/
 | Farbod Moayeri               |                  |
 | Ifaz Hassan                  |                  |
 | Steven Hur                   |                  |
-| Nishita Mukeshbhai Waghela   |                  |
+| Elisa Rong                   |                  |
 | Xuesong Zhou                 |                  |
 
 ---
