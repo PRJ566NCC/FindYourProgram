@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar.js";
 import styles from "@/app/globals.module.css";
 import { useAuth } from "@/components/AuthProvider";
 
@@ -27,6 +26,22 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    // ================== [ TEMP TESTING ACC ] ==================
+    // 'test' / '1234'
+    if (formData.username === 'test' && formData.password === '1234') {
+      try {
+        setSubmitting(true);
+        await refresh(); 
+        router.replace("/profile");
+      } catch (err) {
+        setError("Bypass login failed.");
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+    // ================== [ TEMP TESTING ACC] ====================
 
     if (!formData.username.trim()) {
       setError("Username is required.");
@@ -68,7 +83,6 @@ export default function Login() {
 
   return (
     <>
-      <Navbar />
       <div className={styles.background}>
         <div>
           <img

@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import { AuthProvider } from "@/components/AuthProvider"; 
+import { AuthProvider } from "@/components/AuthProvider";
+import Navbar from "@/components/Navbar"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
         style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         <AuthProvider>
+          <Navbar />
           {children}
         </AuthProvider>
       </body>

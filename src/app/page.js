@@ -2,7 +2,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./globals.module.css";
-import Navbar from "@/components/Navbar";
 import { useAuth } from "@/components/AuthProvider";
 
 export default function Home() {
@@ -12,7 +11,6 @@ export default function Home() {
   if (loading) {
     return (
       <>
-        <Navbar />
         <div className={styles.pageSkeleton}>Loading…</div>
       </>
     );
@@ -20,7 +18,6 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
       {isAuthed ? <SignedInMain /> : <Landing />}
     </>
   );
