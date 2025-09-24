@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import Navbar from "@/components/Navbar.js";
 import styles from "@/app/globals.module.css";
 
 export default function Register() {
@@ -132,7 +131,6 @@ export default function Register() {
   if (isRedirecting) {
     return (
       <>
-        <Navbar />
         <div className={styles.background}>
           <div className={styles.registerContainer}>
             <h1 className={styles.label}>🎉 Registration Successful!</h1>
@@ -145,7 +143,6 @@ export default function Register() {
 
   return (
     <>
-      <Navbar />
       <div className={styles.background}>
         <div>
           <img
