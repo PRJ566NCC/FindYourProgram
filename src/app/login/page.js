@@ -27,22 +27,6 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    // ================== [ TEMP TESTING ACC ] ==================
-    // 'test' / '1234'
-    if (formData.username === 'test' && formData.password === '1234') {
-      try {
-        setSubmitting(true);
-        await refresh(); 
-        router.replace("/profile");
-      } catch (err) {
-        setError("Bypass login failed.");
-      } finally {
-        setSubmitting(false);
-      }
-      return;
-    }
-    // ================== [ TEMP TESTING ACC] ====================
-
     if (!formData.username.trim()) {
       setError("Username is required.");
       return;
@@ -59,7 +43,7 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // make sure auth cookie is accepted
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
@@ -72,8 +56,8 @@ export default function Login() {
         throw new Error(message);
       }
 
-      await refresh();   // update global auth state so Navbar & Home re-render
-      router.replace("/"); // go to homepage
+      await refresh();
+      router.replace("/");
     } catch (err) {
       setError(err.message || "Failed to log in.");
     } finally {
@@ -93,7 +77,6 @@ export default function Login() {
         </div>
         <div className={styles.registerContainer}>
           <form onSubmit={handleSubmit}>
-            {/* Username Input */}
             <div>
               <label className={styles.label} htmlFor="username">
                 Username:
@@ -110,7 +93,6 @@ export default function Login() {
               />
             </div>
 
-            {/* Password Input */}
             <div>
               <label className={styles.label} htmlFor="password">
                 Password:
@@ -127,12 +109,10 @@ export default function Login() {
               />
             </div>
 
-            {/* Error Message */}
             <div className={styles.messageContainer}>
               {error && <p>{error}</p>}
             </div>
 
-            {/* Buttons */}
             <div className={styles.buttonContainer}>
               <button className={styles.registerButton} type="submit" disabled={submitting}>
                 {submitting ? "Logging in..." : "Login"}

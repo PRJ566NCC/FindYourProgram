@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "../../../../lib/mongodb";
+import { connectToDatabase } from "../../../lib/mongodb";
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
@@ -64,3 +64,6 @@ export async function POST(req) {
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+
+export const runtime = "nodejs";
+

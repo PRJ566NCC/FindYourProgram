@@ -1,15 +1,19 @@
 // app/api/login/route.js
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "../../../../lib/mongodb";
+import { connectToDatabase } from "../../../lib/mongodb";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 // Use an environment variable for the secret key
-const JWT_SECRET = process.env.JWT_SECRET || "super-secret-key";
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "7d"; // Token lifespan
 
 export async function POST(req) {
   try {
+    if (!JWT_SECRET) {
+      return NextResponse.json({ message: "Server misconfigured" }, { status: 500 });
+    }
+
     const body = await req.json();
     const username = (body.username || "").trim();
     const password = body.password || "";
@@ -52,7 +56,7 @@ export async function POST(req) {
     response.cookies.set("auth_token", token, {
       httpOnly: true, // Cannot be accessed from JS
       secure: process.env.NODE_ENV === "production", // Only HTTPS in prod
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
     });
@@ -63,3 +67,6 @@ export async function POST(req) {
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+
+export const runtime = "nodejs";
+

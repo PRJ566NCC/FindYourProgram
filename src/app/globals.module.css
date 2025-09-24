@@ -258,3 +258,241 @@ html, body {
   font-family: 'Jetbrains Mono', monospace;
   font-weight: 900;
 }
+
+/* ==========================================================================
+   PROFILE LAYOUT (COMPACT VERSION)
+   - Matches registration/login card style for consistency
+   - Compact sizing ensures confirm buttons remain visible without scrolling
+   ========================================================================== */
+
+.profileLayout {
+  min-height: 90vh;
+  background: #E7DFD8;
+  padding: 36px 20px;
+  display: grid;
+  grid-template-columns: 220px 640px 240px; /* Narrower columns for balance */
+  gap: 24px;
+  justify-content: center;
+  align-items: start;
+}
+
+.profileSideTitle {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 800;
+  font-size: 48px;                    /* Reduced from 56px for compactness */
+  line-height: 1.1;
+  color: #2b2622;
+  white-space: pre-line;
+  margin-top: 8px;
+}
+
+/* ==========================================================================
+   PROFILE CARD
+   - Main container for profile fields
+   - Styled consistently with registration/login cards
+   ========================================================================== */
+
+.profileCard {
+  background-color: #D9D9D9;
+  border: 1px solid #000000;
+  border-radius: 0;
+  padding: 1.5rem 3rem;               /* Tighter padding than register card */
+  width: 100%;
+  max-width: 640px;
+  box-sizing: border-box;
+}
+.profileCard * { box-sizing: border-box; }
+
+.field { margin-bottom: 14px; }
+
+.profileLabel {
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #2b2622;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.profileInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #000000;
+  border-radius: 0;
+  background: #fff;
+  font-family: 'Jetbrains Mono', monospace;
+  font-size: 1.4rem;                  /* Reduced from 2rem */
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   PASSWORD CONTROLS
+   - Provides password view/hide toggle
+   - Supports inline "Change password" interaction
+   ========================================================================== */
+
+.inlinePwdRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.smallLinkBtn {
+  background: none;
+  border: none;
+  color: #1b4d91;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 0.95rem;
+}
+.smallLinkBtn:hover { text-decoration: underline; }
+
+.pwdWrap { position: relative; }
+.pwdWrap .profileInput { padding-right: 40px; }
+
+.eyeBtn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 26px;                       /* Compact size */
+  width: 32px;
+  border: 1px solid #c5c5c5;
+  border-radius: 6px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pwdError {
+  color: #b00020;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* ==========================================================================
+   ACTION BUTTONS
+   - Main form actions (Edit, Confirm, Cancel)
+   ========================================================================== */
+
+.centerBtnRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.primaryWideBtn {
+  min-width: 180px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #8d8d8d;
+  background: #cdd66a;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.secondaryBtn {
+  min-width: 128px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid #a0a0a0;
+  background: #f0f0f0;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* ==========================================================================
+   SIDE ACTIONS
+   - Right-hand side Export/Delete buttons
+   ========================================================================== */
+
+.profileSideButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 12px;
+}
+
+.sideBtn {
+  height: 44px;
+  border-radius: 0;
+  border: 1px solid #000000;
+  background: #D9D9D9;
+  font-weight: 900;
+  font-family: 'Jetbrains Mono', monospace;
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Delete confirmation (clean layout, no overflow, aligned buttons)
+   ========================================================================== */
+
+.confirmCard {
+  background-color: #D9D9D9;
+  border: 1px solid #000000;
+  border-radius: 0;
+  padding: 14px 16px;
+  width: 100%;
+  max-width: 260px;                  /* Prevents stretching in the side column */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirmTitle {
+  font: 900 1rem 'Jetbrains Mono', monospace;
+  margin: 0;
+}
+
+.confirmText {
+  font: 400 0.9rem 'Jetbrains Mono', monospace;
+  margin: 0;
+}
+
+/* Ensures the text field stays inside the card */
+.confirmCard .profileInput {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Aligned buttons with equal width */
+.confirmRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.confirmBtn,
+.cancelBtn {
+  flex: 1 1 0;
+  height: 38px;
+  border-radius: 0;
+  border: 1px solid #000000;
+  font: 900 0.95rem 'Jetbrains Mono', monospace;
+  box-shadow: none;                  /* Avoids raised look on one button */
+}
+
+.confirmBtn {
+  background: #d85a5a;               /* Destructive action */
+  color: #000;
+}
+
+.confirmBtn:disabled {
+  background: #e0a9a9;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.cancelBtn {
+  background: #f0f0f0;
+  color: #000;
+}

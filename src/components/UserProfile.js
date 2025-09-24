@@ -1,177 +1,356 @@
 "use client";
-import React, { useState } from 'react';
-import { useAuth } from '@/components/AuthProvider'
-import styles from '@/app/globals.module.css';
+import React, { useEffect, useMemo, useState } from "react";
+import styles from "@/app/globals.module.css";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 
-function UserProfile() {
-  const { isAuthed } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
+export default function UserProfile() {
+  const router = useRouter();
+  const { refresh } = useAuth();
 
-  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState(null);
+  const [success, setSuccess] = useState("");
 
-  // fetch user profile information once when page is loaded
+  const [showPwd, setShowPwd] = useState(false);
+  const [showPwd2, setShowPwd2] = useState(false);
+  const [wantsPwdChange, setWantsPwdChange] = useState(false);
+
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmUsername, setConfirmUsername] = useState("");
+
+  const [form, setForm] = useState({
+    username: "",
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   useEffect(() => {
-    // No need to fetch data if user is not logged in
-    if (!isAuthed) {
-      setLoading(false);
-      setError("Please log in to view your profile.");
+    let off = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/profile", { credentials: "include", cache: "no-store" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || "Failed to load profile");
+        if (!off) {
+          setForm({
+            username: data.user.username || "",
+            name: data.user.name || "",
+            email: data.user.email || "",
+            password: "",
+            confirmPassword: "",
+          });
+        }
+      } catch (e) {
+        if (!off) setError(e.message || "Failed to load profile");
+      } finally {
+        if (!off) setLoading(false);
+      }
+    })();
+    return () => {
+      off = true;
+    };
+  }, []);
+
+  const onChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+
+  const usernameOk = form.username.trim().length >= 3;
+  const nameOk = !!form.name.trim() && /^[a-zA-Z\s]+$/.test(form.name);
+  const emailOk = /\S+@\S+\.\S+/.test(form.email);
+  const pwdOk =
+    !wantsPwdChange ||
+    (form.password.length >= 6 && form.confirmPassword.length >= 6 && form.password === form.confirmPassword);
+  const formValid = usernameOk && nameOk && emailOk && pwdOk;
+
+  const enterEdit = () => {
+    setEditing(true);
+    setSuccess("");
+    setError("");
+    setWantsPwdChange(false);
+    setShowPwd(false);
+    setShowPwd2(false);
+    setForm((p) => ({ ...p, password: "", confirmPassword: "" }));
+  };
+
+  const submitEdit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!form.username.trim()) return setError("Username is required.");
+    if (form.username.trim().length < 3) return setError("Username must be at least 3 characters long.");
+    if (!form.name.trim()) return setError("Full name is required.");
+    if (!/^[a-zA-Z\s]+$/.test(form.name)) return setError("Name can only contain letters and spaces.");
+    if (!form.email.trim()) return setError("Email is required.");
+    if (!/\S+@\S+\.\S+/.test(form.email)) return setError("Please enter a valid email address.");
+    if (wantsPwdChange) {
+      if (!form.password) return setError("Password is required.");
+      if (form.password.length < 6) return setError("Password must be at least 6 characters long.");
+      if (form.password !== form.confirmPassword) return setError("Passwords do not match.");
+    }
+
+    if (saving) return;
+    setSaving(true);
+
+    try {
+      const r1 = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name: form.name, email: form.email, username: form.username }),
+      });
+      const d1 = await r1.json();
+      if (!r1.ok) throw new Error(d1?.message || "Failed to save profile");
+
+      if (wantsPwdChange) {
+        const r2 = await fetch("/api/profile/password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ newPassword: form.password, confirmPassword: form.confirmPassword }),
+        });
+        let d2 = null;
+        const ct = r2.headers.get("content-type") || "";
+        if (ct.includes("application/json")) {
+          try {
+            d2 = await r2.json();
+          } catch {}
+        }
+        if (!r2.ok) throw new Error(d2?.message || "Failed to change password");
+      }
+
+      setSuccess("Saved");
+      setEditing(false);
+      setWantsPwdChange(false);
+      setShowPwd(false);
+      setShowPwd2(false);
+      setForm((p) => ({ ...p, password: "", confirmPassword: "" }));
+    } catch (e) {
+      setError(e.message || "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    setError("");
+    setSuccess("");
+    const res = await fetch("/api/profile", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ confirmUsername }),
+    });
+    let data = null;
+    const ct = res.headers.get("content-type") || "";
+    if (ct.includes("application/json")) {
+      try {
+        data = await res.json();
+      } catch {}
+    }
+    if (!res.ok) {
+      setError(data?.message || "Failed to delete account");
       return;
     }
-
-    const fetchUserData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/me'); // TODO: call the API
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data.');
-        }
-
-        const data = await response.json();
-        setUserData(data); // save the fetched user data
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [isAuthed]); // if there is status change in isAuthed, run this logic again
-
-  const handleEditClick = () => {
-    if (userData) {
-      setFormData({ ...userData, password: '', confirmPassword: '' });
-    }
-    setIsEditing(true); 
-  };
-  
-  const handleCancelClick = () => {
-    setIsEditing(false);
+    try {
+      await refresh?.();
+    } catch {}
+    router.replace("/");
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Confirm button handler
-  const handleConfirmClick = (e) => {
-    e.preventDefault();
-    // TODO: Add password verification logic
-    // ex: if (formData.password !== formData.confirmPassword) { alert("Passwords do not match!"); return; }
-
-    // TODO: Call API to send the changed data to the server
-    console.log("Updated data:", formData);
-
-    setUserData({ // TEMP
-        username: formData.username,
-        name: formData.name,
-        email: formData.email,
-    });
-    
-    setIsEditing(false);
-  };
-
-  // show this while loading
-  if (loading) {
-    return (
-      <div className={styles.background}>
-        <div className={styles.registerContainer}>
-          <h2>Loading Profile...</h2>
-        </div>
-      </div>
-    );
-  }
-
-  // show this if Error
-  if (error) {
-    return (
-      <div className={styles.background}>
-        <div className={styles.registerContainer}>
-          <h2>Error</h2>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // =======FOR TEST PURPOSE: if there are no data=========
-  if (!userData) {
-      return null;
-  }
-  // ======================================================
+  if (loading) return null;
 
   return (
-    <div className={styles.background}>
-      <div className={styles.registerContainer}>
+    <div className={styles.profileLayout}>
+      <div className={styles.profileSideTitle}>{editing ? "Edit\nProfile" : "User\nProfile"}</div>
 
-        {/* ------------------- Editting mode (isEditing is true) ------------------- */}
-        {isEditing ? (
+      <div className={styles.profileCard}>
+        {!editing ? (
           <>
-            <h2>Edit Profile</h2>
-            <form onSubmit={handleConfirmClick}>
-              <div>
-                <label className={styles.label} htmlFor="username">Username:</label>
-                <input className={styles.inputGroup} type="text" id="username" name="username" value={formData.username} onChange={handleChange} />
+            <div className={styles.field}>
+              <label className={styles.profileLabel}>Username:</label>
+              <input className={styles.profileInput} value={form.username} readOnly />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.profileLabel}>Name:</label>
+              <input className={styles.profileInput} value={form.name} readOnly />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.profileLabel}>Email:</label>
+              <input className={styles.profileInput} value={form.email} readOnly />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.profileLabel}>Password:</label>
+              <input className={styles.profileInput} type="password" value="************" readOnly />
+            </div>
+
+            {(error || success) && (
+              <div className={styles.messageContainer}>
+                {error && <p>{error}</p>}
+                {success && <p className={styles.success}>{success}</p>}
               </div>
-              <div>
-                <label className={styles.label} htmlFor="name">Name:</label>
-                <input className={styles.inputGroup} type="text" id="name" name="name" value={formData.name} onChange={handleChange} />
-              </div>
-              <div>
-                <label className={styles.label} htmlFor="email">Email:</label>
-                <input className={styles.inputGroup} type="email" id="email" name="email" value={formData.email} onChange={handleChange} />
-              </div>
-              <div>
-                <label className={styles.label} htmlFor="password">New Password:</label>
-                <input className={styles.inputGroup} type="password" id="password" name="password" value={formData.password} onChange={handleChange} />
-              </div>
-              <div>
-                <label className={styles.label} htmlFor="confirmPassword">Confirm Password:</label>
-                <input className={styles.inputGroup} type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} />
-              </div>
-              <div className={styles.buttonContainer}>
-                <button type="submit" className={styles.registerButton}>Confirm</button>
-                <button type="button" className={styles.registerButton} onClick={handleCancelClick}>Cancel</button>
-              </div>
-            </form>
-          </>
-        ) : (
-        /* ------------------- Read Only mode (isEditing is false) ------------------- */
-          <>
-            <h2>User Profile</h2>
-            <form>
-              <div>
-                <label className={styles.label} htmlFor="username">Username:</label>
-                <input className={styles.inputGroup} type="text" id="username" value={userData.username} readOnly />
-              </div>
-              <div>
-                <label className={styles.label} htmlFor="name">Name:</label>
-                <input className={styles.inputGroup} type="text" id="name" value={userData.name} readOnly />
-              </div>
-              <div>
-                <label className={styles.label} htmlFor="email">Email:</label>
-                <input className={styles.inputGroup} type="email" id="email" value={userData.email} readOnly />
-              </div>
-            </form>
-            <div className={styles.buttonContainer}>
-                <button className={styles.registerButton} onClick={handleEditClick}>Edit</button>
-                {/* Removed for now */}
-                {/* <button className={styles.registerButton}>Export</button>
-                <button className={styles.registerButton}>Delete</button> */}
+            )}
+
+            <div className={styles.centerBtnRow}>
+              <button className={styles.primaryWideBtn} type="button" onClick={enterEdit}>
+                Edit
+              </button>
             </div>
           </>
+        ) : (
+          <form onSubmit={submitEdit}>
+            <div className={styles.field}>
+              <label className={styles.profileLabel}>Username:</label>
+              <input className={styles.profileInput} name="username" value={form.username} onChange={onChange} />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.profileLabel}>Name:</label>
+              <input className={styles.profileInput} name="name" value={form.name} onChange={onChange} />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.profileLabel}>Email:</label>
+              <input className={styles.profileInput} name="email" value={form.email} onChange={onChange} />
+            </div>
+
+            {!wantsPwdChange ? (
+              <div className={styles.field}>
+                <label className={styles.profileLabel}>Password:</label>
+                <div className={styles.inlinePwdRow}>
+                  <input className={styles.profileInput} type="password" value="************" readOnly />
+                  <button
+                    type="button"
+                    className={styles.smallLinkBtn}
+                    onClick={() => {
+                      setWantsPwdChange(true);
+                      setShowPwd(false);
+                      setShowPwd2(false);
+                      setForm((p) => ({ ...p, password: "", confirmPassword: "" }));
+                    }}
+                  >
+                    Change password
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className={styles.field}>
+                  <label className={styles.profileLabel}>New password:</label>
+                  <div className={styles.pwdWrap}>
+                    <input
+                      className={styles.profileInput}
+                      name="password"
+                      type={showPwd ? "text" : "password"}
+                      value={form.password}
+                      onChange={onChange}
+                    />
+                    <button type="button" className={styles.eyeBtn} onClick={() => setShowPwd((v) => !v)}>
+                      👁
+                    </button>
+                  </div>
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.profileLabel}>Confirm new password:</label>
+                  <div className={styles.pwdWrap}>
+                    <input
+                      className={styles.profileInput}
+                      name="confirmPassword"
+                      type={showPwd2 ? "text" : "password"}
+                      value={form.confirmPassword}
+                      onChange={onChange}
+                    />
+                    <button type="button" className={styles.eyeBtn} onClick={() => setShowPwd2((v) => !v)}>
+                      👁
+                    </button>
+                  </div>
+                  {form.confirmPassword && form.password !== form.confirmPassword && (
+                    <div className={styles.pwdError}>Passwords do not match.</div>
+                  )}
+                  <div className={styles.smallRow}>
+                    <button
+                      type="button"
+                      className={styles.smallLinkBtn}
+                      onClick={() => {
+                        setWantsPwdChange(false);
+                        setForm((p) => ({ ...p, password: "", confirmPassword: "" }));
+                      }}
+                    >
+                      Cancel password change
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {(error || success) && (
+              <div className={styles.messageContainer}>
+                {error && <p>{error}</p>}
+                {success && <p className={styles.success}>{success}</p>}
+              </div>
+            )}
+
+            <div className={styles.centerBtnRow}>
+              <button
+                className={styles.primaryWideBtn}
+                type="submit"
+                disabled={saving || !formValid}
+                title={!formValid ? "Fill all fields. If changing password, both boxes must match (6+ chars)." : ""}
+              >
+                {saving ? "Saving..." : "Confirm"}
+              </button>
+            </div>
+          </form>
         )}
       </div>
+
+      {!editing ? (
+        <div className={styles.profileSideButtons}>
+          <button className={styles.sideBtn} type="button" disabled>
+            Export
+          </button>
+
+          {!confirmingDelete ? (
+            <button className={styles.sideBtn} type="button" onClick={() => setConfirmingDelete(true)}>
+              Delete
+            </button>
+          ) : (
+            <div className={styles.confirmCard}>
+              <div className={styles.confirmTitle}>Delete account</div>
+              <div className={styles.confirmText}>Type your username to confirm:</div>
+              <input
+                className={styles.profileInput}
+                value={confirmUsername}
+                onChange={(e) => setConfirmUsername(e.target.value)}
+              />
+              <div className={styles.confirmRow}>
+                <button
+                  className={styles.confirmBtn}
+                  type="button"
+                  onClick={confirmDelete}
+                  disabled={!confirmUsername.trim()}
+                >
+                  Confirm
+                </button>
+                <button
+                  className={styles.cancelBtn}
+                  type="button"
+                  onClick={() => {
+                    setConfirmingDelete(false);
+                    setConfirmUsername("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div />
+      )}
     </div>
   );
 }
-
-export default UserProfile;
