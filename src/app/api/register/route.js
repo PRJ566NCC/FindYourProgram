@@ -67,10 +67,6 @@ export async function POST(req) {
       reports: []
     };
 
-    // --- Insert new user ---
-    // At this point, we've already checked duplicates.
-    // If two requests still slip in concurrently, a unique index on email/username
-    // will enforce safety (the second will error).
     const result = await users.insertOne(newUser);
 
     return NextResponse.json(
