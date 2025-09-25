@@ -84,7 +84,7 @@ function SignedInMain() {
             <Link href="/search" className={styles.primaryBtn}>
               New Search
             </Link>
-            <Link href="/history" className={styles.secondaryBtn}>
+            <Link href="/history" className={styles.secondaryCtaBtn}>
               Search History
             </Link>
           </div>

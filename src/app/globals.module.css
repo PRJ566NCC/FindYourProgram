@@ -75,7 +75,7 @@ html, body {
   margin-top: 4rem;     
 }
 
-.primaryBtn, .secondaryBtn {
+.primaryBtn, .secondaryCtasBtn {
   display: inline-block;
   padding: 1rem 1.4rem;
   border-radius: 16px;
@@ -89,7 +89,7 @@ html, body {
 }
 
 .primaryBtn   { background: #3273ff; color: #fff; }
-.secondaryBtn { background: #f8edb8; color: #000; }
+.secondaryCtaBtn { background: #f8edb8; color: #000; }
 
 
 
