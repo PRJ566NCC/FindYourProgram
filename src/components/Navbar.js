@@ -12,7 +12,7 @@ export default function Navbar() {
     e.preventDefault();
     await fetch("/api/logout", { method: "POST" });
     await refresh();     
-    router.replace("/login");
+    router.replace("/");
   };
 
   return (
