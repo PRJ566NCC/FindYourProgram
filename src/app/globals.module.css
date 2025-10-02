@@ -210,7 +210,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4rem;
+  gap: 2rem;
   width: 100%;
 }
 
@@ -229,6 +229,7 @@ html, body {
 .searchRow select {
   flex: 1.2;
   padding: 0.4rem 0.6rem;
+  margin: 0.2rem;
   font-size: 1rem;
   font-family: 'Jetbrains Mono', monospace;
   border: 1px solid #000;
@@ -260,7 +261,7 @@ html, body {
 .searchButton {
   padding: 0.8rem 2rem;
   font-size: 1.1rem;
-  background-color: #8183D0;
+  background-color: #5D86D2;
   border-radius: 8px;
   color: white;
   border: 1px solid #000000;
