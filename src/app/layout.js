@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
+import { SearchProvider } from '@/context/SearchContext';
 import Navbar from "@/components/Navbar"; 
 
 const geistSans = Geist({
@@ -31,8 +32,12 @@ export default function RootLayout({ children }) {
         style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         <AuthProvider>
+         <SearchProvider>
           <Navbar />
-          {children}
+            <main>
+              {children}
+            </main>
+          </SearchProvider>
         </AuthProvider>
       </body>
     </html>
