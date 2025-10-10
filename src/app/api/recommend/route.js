@@ -1,6 +1,7 @@
 // src/app/api/recommend/route.js
 
 import { NextResponse } from 'next/server';
+import { connectToDatabase } from "@/lib/mongodb";
 import Groq from 'groq-sdk';
 import * as XLSX from 'xlsx';
 import path from 'path';
@@ -18,7 +19,7 @@ function loadProgramData() {
   }
   try {
     const filePath = path.join(process.cwd(), 'data', 'programs.xlsx');
-
+    
     // 1. Use Node's 'fs' module to read the file into a buffer
     const fileBuffer = fs.readFileSync(filePath);
 
@@ -39,6 +40,9 @@ function loadProgramData() {
     throw new Error("Could not load program data.");
   }
 }
+
+//ensures your route runs in a full Node.js environment
+export const runtime = 'nodejs';
 
 export async function POST(req) {
   try {
@@ -70,7 +74,8 @@ export async function POST(req) {
 
     // 3. send to Groq LLM for ranking and explanation
     const prompt = `
-      You are an expert university academic advisor. Based on the user's preferences and a pre-filtered list of programs, recommend the top 3. For each, explain why it's a great fit.
+      You are an expert university academic advisor. Based on the user's preferences and a pre-filtered list of programs, recommend the top 3. 
+      For each chosen item, return a single field  "matchPercentage" as an integer 0–100 (percentage fit). Higher is better.
 
       User Preferences: ${JSON.stringify(userPreferences, null, 2)}
       Pre-filtered Program List: ${JSON.stringify(relevantPrograms.map(p => ({ programName: p.programName, universityName: p.universityName, description: p.description })), null, 2)}
@@ -79,7 +84,7 @@ export async function POST(req) {
       The JSON format must be:
       {
         "recommendations": [
-          { "programName": "...", "universityName": "...", "reason": "..." }
+          { "programName": "...", "universityName": "...", "matchPercentage": 0}
         ]
       }
     `;
@@ -92,11 +97,30 @@ export async function POST(req) {
     });
 
     const llmResponse = chatCompletion.choices[0]?.message?.content;
+    console.log('Groq raw reply:', llmResponse);
     const parsedResponse = JSON.parse(llmResponse);
 
     if (!parsedResponse.recommendations) {
         throw new Error("AI response format is incorrect.");
     }
+
+    const { db } = await connectToDatabase();
+    const recommendations = parsedResponse.recommendations
+    .map(r => ({
+      programName: r.programName,
+      universityName: r.universityName,
+      matchPercentage:  r.matchPercentage,
+    }))
+    .sort((a, b) => b.matchPercentage - a.matchPercentage)
+    .slice(0, 3);
+
+    // Insert into MongoDB
+    await db.collection("searchResults").insertOne({
+      createdAt: new Date(),
+      preferences: userPreferences,
+      recommendations,
+    });
+        
 
     return NextResponse.json(parsedResponse.recommendations, { status: 200 });
 
