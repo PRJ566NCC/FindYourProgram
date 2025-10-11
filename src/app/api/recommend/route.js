@@ -76,6 +76,7 @@ export async function POST(req) {
     const prompt = `
       You are an expert university academic advisor. Based on the user's preferences and a pre-filtered list of programs, recommend the top 3. 
       For each chosen item, return a single field  "matchPercentage" as an integer 0–100 (percentage fit). Higher is better.
+      Return a single field "facultyName" which must contain ONLY the specific academic unit, school, or faculty name (e.g., "Ted Rogers School of Management" or "Faculty of Arts & Science") from the input list's description.
 
       User Preferences: ${JSON.stringify(userPreferences, null, 2)}
       Pre-filtered Program List: ${JSON.stringify(relevantPrograms.map(p => ({ programName: p.programName, universityName: p.universityName, description: p.description })), null, 2)}
@@ -84,7 +85,7 @@ export async function POST(req) {
       The JSON format must be:
       {
         "recommendations": [
-          { "programName": "...", "universityName": "...", "matchPercentage": 0}
+          { "programName": "...", "universityName": "...", "matchPercentage": 0, "facultyName": "..."}
         ]
       }
     `;

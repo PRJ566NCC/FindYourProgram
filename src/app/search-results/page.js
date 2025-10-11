@@ -5,6 +5,17 @@ import { useSearch } from "@/context/SearchContext";
 import styles from "@/app/globals.module.css";
 import Link from "next/link";
 
+
+const getPercentageStyle = (percentage) => {
+  if (percentage > 89) {
+    return styles.percentageHigh; // Green (for > 90%)
+  } else if (percentage >= 80) {
+    return styles.percentageMedium; // Light Green (for 80% - 90%)
+  } else {
+    return styles.percentageLow; // Yellow (for < 80%)
+  }
+};
+
 export default function SearchResultsPage() {
   const { results, loading, error } = useSearch();
 
@@ -41,29 +52,50 @@ export default function SearchResultsPage() {
       </div>
     );
   }
+  // --- END ERROR/LOADING BLOCKS ---
 
 return (
     <div className={styles.background}>
-      <div className={styles.resultsContainer}>
-        <h2 className={styles.resultsTitle}>Search Results</h2>
-        <div>
-          {Array.isArray(results) && results.map((rec, index) => (
-            <div key={index} className={styles.resultCard}>
-              <div className={styles.percentage}>{rec.matchPercentage || Math.floor(99 - index * 7)}%</div>
+      
+      <div className={styles.searchResultsContainer}> 
+        
+        {/* 1. TITLE BLOCK: The "Search Results" title is positioned on the side. */}
+        <h2 className={styles.searchResultsTitle}>Search Results</h2>
+        
+        {/* 2. RESULTS LIST BLOCK: This wrapper contains all the individual result cards. */}
+        <div className={styles.searchResultsListWrapper}> 
+          {Array.isArray(results) && results.map((rec, index) => {
+            
+             const matchPercentage = rec.matchPercentage || Math.floor(99 - index * 7);
+             const percentageClass = getPercentageStyle(matchPercentage);
+
+            return (
+       
+            <div key={index} className={styles.searchResultsCard}> 
               
-              {/* 1. Text content now comes first */}
-              <div className={styles.cardContent}>
-                  <h3 className={styles.cardTitle}>{rec.programName}</h3>
-                  <p className={styles.cardMeta}>{rec.universityName}</p>
+              {/* TEXT CONTENT BLOCK */}
+              <div className={styles.searchResultsCardContent}>
+                
+                {/* 3. PERCENTAGE: Dynamic color class applied */}
+                <div className={`${styles.searchResultsPercentage} ${percentageClass}`}>
+                  {matchPercentage}%
+                </div>
+                
+                {/* 4. PROGRAM NAME */}
+                <h3 className={styles.searchResultsCardTitle}>
+                  {rec.programName}
+                </h3>
+                
+                {/* 5. METADATA: University and Faculty Name */}
+                <p className={styles.searchResultsCardMeta}>
+                  {rec.universityName} . {rec.facultyName} . Ontario 
+                </p>
               </div>
 
-              {/* 2. Map container now comes second, on the right */}
-              <div className={styles.mapContainer}>
-                  <img src="/map_placeholder.png" alt="Map Preview" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                  <button className={styles.mapButton}>Show On Map</button>
               </div>
-            </div>
-          ))}
+
+          );
+        })}
         </div>
       </div>
     </div>

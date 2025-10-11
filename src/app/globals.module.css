@@ -190,6 +190,112 @@ html, body {
   width: 150%;
   height: auto;
 }
+
+/* =======================
+   SEARCH FORM LAYOUT
+   ======================= */
+.searchContainer {
+  background-color: #D9D9D9;
+  border: 1px solid #000000;
+  padding: 2rem 3rem;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* One row: label left, input right */
+.searchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+}
+
+/* Label style for search form */
+.searchLabel {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2b2622;
+  flex: 1;
+  text-align: left;
+}
+
+/* Inputs, selects inside rows */
+.searchRow input,
+.searchRow select {
+  flex: 1.2;
+  padding: 0.4rem 0.6rem;
+  margin: 0.2rem;
+  font-size: 1rem;
+  font-family: 'Jetbrains Mono', monospace;
+  border: 1px solid #000;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* Checkbox groups for priorities & subjects */
+.searchCheckboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  flex: 1.2;
+}
+.searchCheckboxGroup label {
+  font-family: 'Jetbrains Mono', monospace;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Button row */
+.searchButtonRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.searchButton {
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  background-color: #5D86D2;
+  border-radius: 8px;
+  color: white;
+  border: 1px solid #000000;
+  font-family: 'Jetbrains Mono', monospace;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* Checkbox group wrapper */
+.searchCheckboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  flex: 2.7;
+}
+
+/* Each checkbox label */
+.searchCheckboxGroup label {
+  font-family: 'Jetbrains Mono', monospace;
+  font-size: 1.1rem;      /* bigger font */
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+/* Make the checkboxes themselves slightly larger */
+.searchCheckboxGroup input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
 /* --------------------------------------- COMPONENTS ---------------------------------------------------*/
 /* COMPONENT: navbar.js */
 .header {
@@ -495,4 +601,110 @@ html, body {
 .cancelBtn {
   background: #f0f0f0;
   color: #000;
+}
+
+
+
+/* ========================================================= */
+/* 1. SEARCH RESULTS WRAPPER AND TITLE LAYOUT (Two-Column) */
+/* ========================================================= */
+
+.searchResultsContainer {
+    position: relative;
+    display: flex;
+    gap: 100px; 
+    width: 90%; 
+    max-width: 1200px;
+    margin: 28px auto; 
+    padding: 28px 0; 
+    align-items: center; 
+}
+
+.searchResultsTitle {
+    /* Style for the "Search Results" text on the left side */
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #000;
+    width: 150px;
+    font-family: 'Jetbrains Mono', monospace;
+    text-align: right;
+    flex-shrink: 0; 
+}
+
+
+/* ========================================================= */
+/* 2. INDIVIDUAL RESULT CARD STYLES */
+/* ========================================================= */
+
+.searchResultsCard {
+    display: flex;
+    justify-content: space-between; 
+    align-items: stretch; 
+    background-color: #f7d2d2; 
+    border-radius: 20px;
+    padding: 28px 30px;
+    margin: 28px 0;
+    box-shadow: 0 1px 0 rgba(0,0,0,.25);
+    min-height: 140px;
+    position: relative; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    overflow: hidden; 
+}
+
+.searchResultsCardContent {
+    flex-grow: 1; 
+    padding-right: 20px;
+    position: relative; 
+}
+
+
+/* ========================================================= */
+/* 3. CONTENT STYLES (Text, Percentage, Metadata) */
+/* ========================================================= */
+
+.searchResultsPercentage {
+    /* Percentage (99%, 80%, 70%) - Positioned inside the pink card */
+    position: absolute;
+    top: 15px; 
+    right: 15px; 
+    font-weight: bold;
+    font-size: 1.2rem;
+    z-index: 5;
+}
+
+
+.percentageHigh {
+    color: #128712; /* Green: > 90% */
+    font-family: 'Jetbrains Mono', monospace
+}
+
+.percentageMedium {
+    color: #a3c94c; /* Light Green: 80% - 90% */
+    font-family: 'Jetbrains Mono', monospace
+}
+
+.percentageLow {
+    color: #cc8400; /* Yellow: < 80% */
+    font-family: 'Jetbrains Mono', monospace
+}
+
+
+.searchResultsCardTitle {
+    /* Styling for the program name (e.g., B.Comm. in Accounting & Finance) */
+    margin: 0 0 .8rem 0;
+    font-weight: 900;
+    font-size: 1.9rem;
+    font-family: 'Jetbrains Mono', monospace;
+}
+
+
+
+.searchResultsCardMeta {
+    /* Styling for the detailed metadata (University . Faculty . Ontario) */
+    font-size: 1.4rem;
+    color: #000;
+    line-height: 1.4;
+    font-weight: normal;
+    font-family: 'Jetbrains Mono', monospace
 }
