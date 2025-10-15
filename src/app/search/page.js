@@ -1,30 +1,44 @@
+// src/app/search/page.js
+
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // Kept the import, though its use is removed from submit
+// 1. CRITICAL IMPORT: Bring in the context hook for AI calls
+import { useSearch } from "@/context/SearchContext"; 
 import styles from "@/app/globals.module.css";
 
 export default function Search() {
+  // 2. INTEGRATION: Get the AI fetching function and status from your context
+  // We rename the error to 'apiError' to avoid conflict with the form's local 'error' state.
+  const { fetchRecommendations, loading, error: apiError } = useSearch();
+
+  // 3. FORM STATE: State to capture all user input (from the new form code)
   const [formData, setFormData] = useState({
-    international: "Yes",
-    education: "Secondary",
-    degree: "Undergraduate",
-    field: "Business",
-    program: "Accounting",
-    hasSecondary: "Yes",
-    secondaryProgram: "Finance",
-    hasBudget: "Yes",
-    maxTuition: "30000",
-    hasLocation: "Yes",
-    location: "GTA",
-    hasLiving: "Yes",
-    livingBudget: "20000",
-    priorities: [],
+    international: "", 
+    education: "",    
+    degree: "",
+    field: "",
+    program: "",
+    
+    hasSecondary: "No",
+    secondaryProgram: "",
+    
+    hasBudget: "No",
+    maxTuition: "",
+
+    hasLocation: "No",
+    location: "",
+    
+    hasLiving: "No",
+    livingBudget: "",
+    
+    // Keep arrays empty
+    priorities: [], 
     subjects: [],
   });
 
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [formError, setFormError] = useState(""); 
 
   const handleCheckbox = (group, value) => {
     setFormData((prev) => {
@@ -35,50 +49,50 @@ export default function Search() {
     });
   };
 
-  
   const validateForm = () => {
+    // All validation logic from the new form code is preserved here
     if (!formData.program.trim()) {
-      setError("Preferred program is required.");
+      setFormError("Preferred program is required.");
       return false;
     }
 
     if (formData.hasSecondary === "Yes" && !formData.secondaryProgram.trim()) {
-      setError("Secondary program cannot be empty.");
+      setFormError("Secondary program cannot be empty.");
       return false;
     }
 
     if (formData.hasBudget === "Yes" && (!formData.maxTuition || formData.maxTuition <= 0)) {
-      setError("Please enter a valid tuition budget.");
+      setFormError("Please enter a valid tuition budget.");
       return false;
     }
 
     if (formData.hasLiving === "Yes" && (!formData.livingBudget || formData.livingBudget <= 0)) {
-      setError("Please enter a valid living expense budget.");
+      setFormError("Please enter a valid living expense budget.");
       return false;
     }
 
     if (formData.priorities.length === 0) {
-      setError("Select at least one priority.");
+      setFormError("Select at least one priority.");
       return false;
     }
 
     if (formData.subjects.length === 0) {
-      setError("Select at least one subject.");
+      setFormError("Select at least one subject.");
       return false;
     }
 
-    setError("");
+    setFormError("");
     return true;
   };
 
+  // 4. CRITICAL MERGE: Update handleSubmit to use the AI context function
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       
-      const encodedFormData = encodeURIComponent(JSON.stringify(formData));
-      router.push(`/search-results?data=${encodedFormData}`);
-      
-      
+      // This sends the data to the server API, replacing the old hardcoded 'testPreferences'.
+      // The navigation to /search-results is handled inside SearchContext after the fetch is complete.
+      fetchRecommendations(formData);
     }
   }
 
@@ -264,14 +278,14 @@ export default function Search() {
           <div className={styles.searchRow}>
           <label className={styles.searchLabel}>Select your Priorities:</label>
           <div className={styles.searchCheckboxGroup}>
-              {["Accreditation", "World Rank", "Co-op"].map((priority) => (
+            {["Accreditation", "World Rank", "Co-op"].map((priority) => (
               <label key={priority}>
-                  <input
+                <input
                   type="checkbox"
                   checked={formData.priorities.includes(priority)}
                   onChange={() => handleCheckbox("priorities", priority)}
-                  />
-                  {priority}
+                />
+                {priority}
               </label>
               ))}
           </div>
@@ -281,25 +295,33 @@ export default function Search() {
           <div className={styles.searchRow}>
           <label className={styles.searchLabel}>Select Subjects you excel:</label>
           <div className={styles.searchCheckboxGroup}>
-              {["Math", "Science", "Language", "History", "Arts"].map((subject) => (
+            {["Math", "Science", "Language", "History", "Arts"].map((subject) => (
               <label key={subject}>
-                  <input
+                <input
                   type="checkbox"
                   checked={formData.subjects.includes(subject)}
                   onChange={() => handleCheckbox("subjects", subject)}
-                  />
-                  {subject}
+                />
+                {subject}
               </label>
               ))}
           </div>
           </div>
 
           <div className={styles.messageContainer}>
-              {error && <p>{error}</p>}
-            </div>
+            {/* Display either the local form error OR the API error */}
+            {(formError || apiError) && <p style={{color: 'red'}}>{formError || apiError}</p>}
+          </div>
+
           {/* Search Button */}
           <div className={styles.searchButtonRow}>
-            <button className={styles.searchButton}>Search</button>
+            {/* 5. Update the button to use the loading state from context */}
+            <button 
+                className={styles.searchButton}
+                disabled={loading} 
+            >
+                {loading ? 'AI is analyzing...' : 'Search'}
+            </button>
           </div>
         </form>
       </div>

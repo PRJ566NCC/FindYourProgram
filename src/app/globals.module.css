@@ -602,3 +602,109 @@ html, body {
   background: #f0f0f0;
   color: #000;
 }
+
+
+
+/* ========================================================= */
+/* 1. SEARCH RESULTS WRAPPER AND TITLE LAYOUT (Two-Column) */
+/* ========================================================= */
+
+.searchResultsContainer {
+    position: relative;
+    display: flex;
+    gap: 100px; 
+    width: 90%; 
+    max-width: 1200px;
+    margin: 28px auto; 
+    padding: 28px 0; 
+    align-items: center; 
+}
+
+.searchResultsTitle {
+    /* Style for the "Search Results" text on the left side */
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #000;
+    width: 150px;
+    font-family: 'Jetbrains Mono', monospace;
+    text-align: right;
+    flex-shrink: 0; 
+}
+
+
+/* ========================================================= */
+/* 2. INDIVIDUAL RESULT CARD STYLES */
+/* ========================================================= */
+
+.searchResultsCard {
+    display: flex;
+    justify-content: space-between; 
+    align-items: stretch; 
+    background-color: #f7d2d2; 
+    border-radius: 20px;
+    padding: 28px 30px;
+    margin: 28px 0;
+    box-shadow: 0 1px 0 rgba(0,0,0,.25);
+    min-height: 140px;
+    position: relative; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    overflow: hidden; 
+}
+
+.searchResultsCardContent {
+    flex-grow: 1; 
+    padding-right: 20px;
+    position: relative; 
+}
+
+
+/* ========================================================= */
+/* 3. CONTENT STYLES (Text, Percentage, Metadata) */
+/* ========================================================= */
+
+.searchResultsPercentage {
+    /* Percentage (99%, 80%, 70%) - Positioned inside the pink card */
+    position: absolute;
+    top: 15px; 
+    right: 15px; 
+    font-weight: bold;
+    font-size: 1.2rem;
+    z-index: 5;
+}
+
+
+.percentageHigh {
+    color: #128712; /* Green: > 90% */
+    font-family: 'Jetbrains Mono', monospace
+}
+
+.percentageMedium {
+    color: #a3c94c; /* Light Green: 80% - 90% */
+    font-family: 'Jetbrains Mono', monospace
+}
+
+.percentageLow {
+    color: #cc8400; /* Yellow: < 80% */
+    font-family: 'Jetbrains Mono', monospace
+}
+
+
+.searchResultsCardTitle {
+    /* Styling for the program name (e.g., B.Comm. in Accounting & Finance) */
+    margin: 0 0 .8rem 0;
+    font-weight: 900;
+    font-size: 1.9rem;
+    font-family: 'Jetbrains Mono', monospace;
+}
+
+
+
+.searchResultsCardMeta {
+    /* Styling for the detailed metadata (University . Faculty . Ontario) */
+    font-size: 1.4rem;
+    color: #000;
+    line-height: 1.4;
+    font-weight: normal;
+    font-family: 'Jetbrains Mono', monospace
+}
