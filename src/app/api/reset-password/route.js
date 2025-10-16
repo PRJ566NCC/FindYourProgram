@@ -22,7 +22,7 @@ export async function POST(req) {
 
     if (!/\S+@\S+\.\S+/.test(email))           return NextResponse.json({ message: "Invalid email." }, { status: 400 });
     if (!code || code.length < 4)              return NextResponse.json({ message: "Invalid code." }, { status: 400 });
-    if (!newPassword || newPassword.length<8)  return NextResponse.json({ message: "Password must be at least 8 characters." }, { status: 400 });
+    if (!newPassword || newPassword.length<6)  return NextResponse.json({ message: "Password must be at least 6 characters." }, { status: 400 });
 
     ({ client, db } = await getDb());          // <-- destructure directly
     const users = db.collection("users");
