@@ -37,7 +37,6 @@ export default function ForgotPage() {
         throw new Error(msg);
       }
 
-      // 不暴露邮箱是否存在
       setInfo("If that email exists, we sent a reset link.");
       setEmail("");
     } catch (err) {

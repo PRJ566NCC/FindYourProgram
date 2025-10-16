@@ -5,8 +5,17 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 
+async function getDb() {
+  const { MongoClient } = await import("mongodb");
+  const uri = process.env.MONGODB_URI;
+  const dbName = process.env.MONGODB_DB || "FindYourProgram";
+  const client = await new MongoClient(uri).connect();
+  const db = client.db(dbName);
+  return { client, db };
+}
+
 export async function POST(req) {
-  const { connectToDatabase } = await import("@/lib/mongodb_rt");
+  let client, db;                    // <-- declare db
   try {
     const { email: raw, code, newPassword } = await req.json();
     const email = (raw || "").trim().toLowerCase();
@@ -15,7 +24,7 @@ export async function POST(req) {
     if (!code || code.length < 4)              return NextResponse.json({ message: "Invalid code." }, { status: 400 });
     if (!newPassword || newPassword.length<8)  return NextResponse.json({ message: "Password must be at least 8 characters." }, { status: 400 });
 
-    const { db } = await connectToDatabase();
+    ({ client, db } = await getDb());          // <-- destructure directly
     const users = db.collection("users");
     const user = await users.findOne({ email });
     if (!user || !user.passwordResetCodeHash || !user.passwordResetExpires) {
@@ -40,5 +49,7 @@ export async function POST(req) {
   } catch (err) {
     console.error("reset-password error:", err);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
+  } finally {
+    if (client) await client.close();
   }
 }

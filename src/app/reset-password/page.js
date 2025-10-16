@@ -1,4 +1,3 @@
-// src/app/reset-password/page.js
 "use client";
 
 import { useState, useEffect } from "react";
@@ -57,7 +56,6 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // 统一按钮样式（不换行 + 居中 + 固定高度）
   const btnStyle = {
     display: "inline-flex",
     alignItems: "center",
@@ -71,7 +69,6 @@ export default function ResetPasswordPage() {
 
   return (
     <div className={styles.background}>
-      {/* 左侧 Logo */}
       <div>
         <img
           src="/FindYourProgramLogo.png"
@@ -80,7 +77,6 @@ export default function ResetPasswordPage() {
         />
       </div>
 
-      {/* 右侧卡片 */}
       <div
         className={styles.registerContainer}
         style={{ width: 560, padding: 28, borderRadius: 12 }}
