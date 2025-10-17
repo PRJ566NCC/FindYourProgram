@@ -74,7 +74,7 @@ export async function POST(req) {
 
     // 3. send to Groq LLM for ranking and explanation
     const prompt = `
-      You are an expert university academic advisor. Based on the user's preferences and a pre-filtered list of programs, recommend the top 3. 
+      You are an expert university academic advisor. Based on the user's preferences and a pre-filtered list of programs, recommend the top 3 in Ontario. 
       For each chosen item, return a single field  "matchPercentage" as an integer 0–100 (percentage fit). Higher is better.
       Return a single field "facultyName" which must contain ONLY the specific academic unit, school, or faculty name (e.g., "Ted Rogers School of Management" or "Faculty of Arts & Science") from the input list's description.
 

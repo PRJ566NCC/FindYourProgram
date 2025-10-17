@@ -142,7 +142,6 @@ export default function Search() {
             >
               <option>Undergraduate</option>
               <option>Graduate</option>
-              <option>Diploma</option>
             </select>
           </div>
 

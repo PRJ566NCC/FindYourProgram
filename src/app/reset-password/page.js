@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import styles from "@/app/globals.module.css";
 
-export default function ResetPasswordPage() {
+function ResetPasswordInner() {
   const sp = useSearchParams();
   const router = useRouter();
 
@@ -23,7 +23,8 @@ export default function ResetPasswordPage() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setErr(""); setMsg("");
+    setErr("");
+    setMsg("");
 
     if (!email.trim() || !code.trim() || !pwd || !confirm) {
       setErr("All fields are required.");
@@ -178,5 +179,13 @@ export default function ResetPasswordPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordInner />
+    </Suspense>
   );
 }
