@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Kept the import, though its use is removed from submit
 // 1. CRITICAL IMPORT: Bring in the context hook for AI calls
 import { useSearch } from "@/context/SearchContext"; 
@@ -39,6 +39,21 @@ export default function Search() {
   });
 
   const [formError, setFormError] = useState(""); 
+
+  // Prefill the form when user clicks "Edit Search" from history
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("FYP_EDIT_PREFS");
+      if (raw) {
+        const prefs = JSON.parse(raw);
+        // Merge to preserve defaults if any key is missing
+        setFormData((prev) => ({ ...prev, ...prefs }));
+        sessionStorage.removeItem("FYP_EDIT_PREFS");
+      }
+    } catch {
+      // no-op
+    }
+  }, []);
 
   const handleCheckbox = (group, value) => {
     setFormData((prev) => {
