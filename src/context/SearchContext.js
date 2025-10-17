@@ -1,5 +1,3 @@
-// src/context/SearchContext.js
-
 "use client";
 import { createContext, useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -22,6 +20,7 @@ export function SearchProvider({ children }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(preferences),
+        credentials: 'include', // ✅ send cookies so backend sees auth_token
       });
 
       if (!response.ok) {
