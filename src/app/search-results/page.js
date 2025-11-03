@@ -2,6 +2,7 @@
 
 "use client";
 import { useSearch } from "@/context/SearchContext";
+import MapPin from "@/components/MapPin";
 import styles from "@/app/globals.module.css";
 import Link from "next/link";
 
@@ -70,32 +71,42 @@ return (
              const percentageClass = getPercentageStyle(matchPercentage);
 
             return (
-       
-            <div key={index} className={styles.searchResultsCard}> 
-              
-              {/* TEXT CONTENT BLOCK */}
-              <div className={styles.searchResultsCardContent}>
-                
-                {/* 3. PERCENTAGE: Dynamic color class applied */}
-                <div className={`${styles.searchResultsPercentage} ${percentageClass}`}>
-                  {matchPercentage}%
+              <div key={index} style={{display: "flex", flexDirection: "row", alignItems: "center"}}> 
+                <div className={styles.searchResultsCard}>
+                  {/* TEXT CONTENT BLOCK */}
+                  <div className={styles.searchResultsCardContent}>
+                    
+                    {/* 3. PERCENTAGE: Dynamic color class applied */}
+                    <div className={`${styles.searchResultsPercentage} ${percentageClass}`}>
+                      {matchPercentage}%
+                    </div>
+                    
+                    {/* 4. PROGRAM NAME */}
+                    <h3 className={styles.searchResultsCardTitle}>
+                      {rec.programName}
+                    </h3>
+                    
+                    {/* 5. METADATA: University and Faculty Name */}
+                    <p className={styles.searchResultsCardMeta}>
+                      {rec.universityName} . {rec.facultyName} . Ontario 
+                    </p>
+
+                    {/* 6. LONGITUDE AND LATITUDE */}
+                    
+                  </div>
                 </div>
-                
-                {/* 4. PROGRAM NAME */}
-                <h3 className={styles.searchResultsCardTitle}>
-                  {rec.programName}
-                </h3>
-                
-                {/* 5. METADATA: University and Faculty Name */}
-                <p className={styles.searchResultsCardMeta}>
-                  {rec.universityName} . {rec.facultyName} . Ontario 
-                </p>
-              </div>
+                <div>
+                  <MapPin
+                    lat={rec.latitude}
+                    lng={rec.longitude}
+                    name={rec.universityName}
+                  />
+                </div>
 
               </div>
-
-          );
+            );
         })}
+        
         </div>
       </div>
     </div>

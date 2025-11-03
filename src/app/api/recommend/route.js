@@ -77,7 +77,7 @@ export async function POST(req) {
 
     const prompt = `
       You are an expert university academic advisor. Based on the user's preferences and a pre-filtered list of programs, recommend the top 3 in Ontario.
-      For each chosen item, return "matchPercentage" (integer 0–100) and "facultyName".
+      For each chosen item, return "matchPercentage" (integer 0–100) and "facultyName" as well as the latitude and longitude of the location of the university/college.
       User Preferences: ${JSON.stringify(userPreferences, null, 2)}
       Pre-filtered List: ${JSON.stringify(relevantPrograms.map(p => ({
         programName: p.programName,
@@ -85,7 +85,7 @@ export async function POST(req) {
         description: p.description,
       })), null, 2)}
       Respond only with JSON in this format:
-      { "recommendations": [ { "programName": "", "universityName": "", "matchPercentage": 0, "facultyName": "" } ] }
+      { "recommendations": [ { "programName": "", "universityName": "", "matchPercentage": 0, "facultyName": "", "latitude": 0.0, "longitude": 0.0 } ] }
     `;
 
     const chatCompletion = await groq.chat.completions.create({
