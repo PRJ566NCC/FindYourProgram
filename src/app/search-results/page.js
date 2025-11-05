@@ -70,29 +70,34 @@ return (
              const percentageClass = getPercentageStyle(matchPercentage);
 
             return (
-       
-            <div key={index} className={styles.searchResultsCard}> 
-              
+
+            <Link
+              key={index}
+              href={`/programs/${encodeURIComponent(rec.courseCode || rec.programName)}`}
+              className={styles.searchResultsCard}
+              style={{ textDecoration: "none", cursor: "pointer" }}
+            >
+
               {/* TEXT CONTENT BLOCK */}
               <div className={styles.searchResultsCardContent}>
-                
+
                 {/* 3. PERCENTAGE: Dynamic color class applied */}
                 <div className={`${styles.searchResultsPercentage} ${percentageClass}`}>
                   {matchPercentage}%
                 </div>
-                
+
                 {/* 4. PROGRAM NAME */}
                 <h3 className={styles.searchResultsCardTitle}>
                   {rec.programName}
                 </h3>
-                
+
                 {/* 5. METADATA: University and Faculty Name */}
                 <p className={styles.searchResultsCardMeta}>
-                  {rec.universityName} . {rec.facultyName} . Ontario 
+                  {rec.universityName} . {rec.facultyName} . Ontario
                 </p>
               </div>
 
-              </div>
+              </Link>
 
           );
         })}
