@@ -2,7 +2,51 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "../../../lib/mongodb";
 
-// GET: Fetch rating for a specific program
+// --- POST: add new rating ---
+export async function POST(req) {
+  try {
+    const body = await req.json();
+    const { programName, universityName, location, rating } = body;
+
+    if (!programName || !universityName || !rating) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const { db } = await connectToDatabase();
+
+    // ✅ Store new rating
+    await db.collection("ratings").insertOne({
+      programName,
+      universityName,
+      location,
+      rating,
+      createdAt: new Date(),
+    });
+
+    // ✅ Recalculate average
+    const ratings = await db
+      .collection("ratings")
+      .find({ programName, universityName, location })
+      .toArray();
+
+    const avgRating =
+      ratings.reduce((sum, r) => sum + (r.rating || 0), 0) / ratings.length;
+
+    return NextResponse.json({
+      success: true,
+      averageRating: avgRating,
+      totalRatings: ratings.length,
+    });
+  } catch (err) {
+    console.error("Error in POST /api/ratings:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+// --- GET: fetch average rating ---
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -10,47 +54,34 @@ export async function GET(req) {
     const universityName = searchParams.get("universityName");
     const location = searchParams.get("location");
 
-    if (!programName || !universityName || !location) {
-      return NextResponse.json({ message: "Missing parameters" }, { status: 400 });
+    if (!programName || !universityName) {
+      return NextResponse.json(
+        { error: "Missing required query parameters" },
+        { status: 400 }
+      );
     }
 
     const { db } = await connectToDatabase();
 
-    const ratingDoc = await db.collection("ratings").findOne({
-      programName,
-      universityName,
-      location,
+    const ratings = await db
+      .collection("ratings")
+      .find({ programName, universityName, location })
+      .toArray();
+
+    if (ratings.length === 0) {
+      return NextResponse.json({ rating: 0, count: 0 });
+    }
+
+    const avgRating =
+      ratings.reduce((sum, r) => sum + (r.rating || 0), 0) / ratings.length;
+
+    return NextResponse.json({
+      rating: avgRating,
+      count: ratings.length,
     });
-
-    return NextResponse.json({ rating: ratingDoc?.rating || 0 }, { status: 200 });
   } catch (err) {
-    console.error("GET /api/ratings error:", err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
-  }
-}
-
-// POST: Save or update a rating
-export async function POST(req) {
-  try {
-    const body = await req.json();
-    const { programName, universityName, location, rating } = body;
-
-    if (!programName || !universityName || !location || !rating) {
-      return NextResponse.json({ message: "Missing fields" }, { status: 400 });
-    }
-
-    const { db } = await connectToDatabase();
-
-    await db.collection("ratings").updateOne(
-      { programName, universityName, location },
-      { $set: { rating } },
-      { upsert: true }
-    );
-
-    return NextResponse.json({ message: "Rating saved successfully" }, { status: 200 });
-  } catch (err) {
-    console.error("POST /api/ratings error:", err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    console.error("Error in GET /api/ratings:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 

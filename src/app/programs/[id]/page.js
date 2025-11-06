@@ -12,10 +12,12 @@ export default function ProgramDetailPage() {
   const [logoError, setLogoError] = useState(false);
 
   const [isRatingOpen, setIsRatingOpen] = useState(false);
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(0); // average rating
+  const [ratingCount, setRatingCount] = useState(0); // total number of ratings
+  const [userRating, setUserRating] = useState(0); // current user rating
   const [hover, setHover] = useState(0);
 
-  // 1️⃣ Fetch program details first
+  // Fetch program details
   useEffect(() => {
     if (!id) return;
 
@@ -40,32 +42,33 @@ export default function ProgramDetailPage() {
     })();
   }, [id]);
 
-  // 2️⃣ Once program loads, fetch its rating
-  useEffect(() => {
+  // Fetch average rating + count
+  async function fetchRating() {
     if (!program) return;
+    try {
+      const params = new URLSearchParams({
+        programName: program.programName,
+        universityName: program.universityName,
+        location: program.location || "Unknown",
+      });
 
-    (async () => {
-      try {
-        const params = new URLSearchParams({
-          programName: program.programName,
-          universityName: program.universityName,
-          location: program.location || "Unknown",
-        });
+      const res = await fetch(`/api/ratings?${params.toString()}`, {
+        cache: "no-store",
+      });
 
-        const res = await fetch(`/api/ratings?${params.toString()}`, {
-          cache: "no-store",
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setRating(data.rating || 0);
-        }
-      } catch (err) {
-        console.error("Error loading rating:", err);
+      if (res.ok) {
+        const data = await res.json();
+        setRating(data.rating || 0);
+        setRatingCount(data.count || 0);
       }
-    })();
-  }, [program]);
+    } catch (err) {
+      console.error("Error loading rating:", err);
+    }
+  }
 
+  useEffect(() => {
+    fetchRating();
+  }, [program]);
 
   if (loading) {
     return (
@@ -253,7 +256,6 @@ export default function ProgramDetailPage() {
               }}
             ></div>
 
-            {/*if logo exists */}
             {program.universityLogoUrl && !logoError ? (
               <img
                 src={program.universityLogoUrl}
@@ -402,6 +404,13 @@ export default function ProgramDetailPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2>Rate this Program</h2>
+
+            <p style={{ margin: "10px 0", color: "#555" }}>
+              Current Rating:{" "}
+              <strong>{rating.toFixed(1)} / 5</strong> (
+              {ratingCount} {ratingCount === 1 ? "rating" : "ratings"})
+            </p>
+
             <div
               style={{
                 display: "flex",
@@ -416,10 +425,11 @@ export default function ProgramDetailPage() {
                   style={{
                     fontSize: "2rem",
                     cursor: "pointer",
-                    color: (hover || rating) >= star ? "#FFD700" : "#ccc",
+                    color:
+                      (hover || userRating) >= star ? "#FFD700" : "#ccc",
                     transition: "color 0.2s",
                   }}
-                  onClick={() => setRating(star)}
+                  onClick={() => setUserRating(star)}
                   onMouseEnter={() => setHover(star)}
                   onMouseLeave={() => setHover(0)}
                 >
@@ -427,6 +437,7 @@ export default function ProgramDetailPage() {
                 </span>
               ))}
             </div>
+
             <div
               style={{
                 display: "flex",
@@ -436,8 +447,7 @@ export default function ProgramDetailPage() {
             >
               <button
                 onClick={async () => {
-                  if (!rating) return;
-
+                  if (!userRating) return;
                   try {
                     const res = await fetch("/api/ratings", {
                       method: "POST",
@@ -446,17 +456,15 @@ export default function ProgramDetailPage() {
                         programName: program.programName,
                         universityName: program.universityName,
                         location: program.location || "Unknown",
-                        rating,
+                        rating: userRating,
                       }),
                     });
 
-                    if (!res.ok) {
-                      console.error("Failed to submit rating");
-                    } else {
-                      console.log("Rating saved successfully");
-                    }
+                    if (!res.ok) throw new Error("Failed to submit rating");
+                    await fetchRating(); // refresh average/count
                   } catch (err) {
                     console.error("Error saving rating:", err);
+                    alert("Error saving rating.");
                   } finally {
                     setIsRatingOpen(false);
                   }
