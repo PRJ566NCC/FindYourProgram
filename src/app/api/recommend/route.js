@@ -33,16 +33,6 @@ export async function POST(req) {
     const userPreferences = await req.json();
 
     const prompt = `
-      You are an expert university academic advisor. Based on the user's preferences and a pre-filtered list of programs, recommend the top 3 in Ontario.
-      For each chosen item, return "matchPercentage" (integer 0–100) and "facultyName" as well as the latitude and longitude of the location of the university/college.
-      User Preferences: ${JSON.stringify(userPreferences, null, 2)}
-      Pre-filtered List: ${JSON.stringify(relevantPrograms.map(p => ({
-        programName: p.programName,
-        universityName: p.universityName,
-        description: p.description,
-      })), null, 2)}
-      Respond only with JSON in this format:
-      { "recommendations": [ { "programName": "", "universityName": "", "matchPercentage": 0, "facultyName": "", "latitude": 0.0, "longitude": 0.0 } ] }
       You are an expert university academic advisor in Ontario, Canada.
       
       A student has provided these preferences. Recommend the top 3 REAL degree or diploma programs that match ALL of these criteria:
@@ -88,7 +78,9 @@ export async function POST(req) {
             "description": "2-3 sentences explaining why this program matches the student's profile",
             "prerequisites": "admission requirements (e.g., Ontario Secondary School Diploma, specific courses)",
             "websiteLink": "official university program page URL",
-            "matchPercentage": 95
+            "matchPercentage": 95,
+            "latitude": 0.0, 
+            "longitude": 0.0
           }
         ]
       }
