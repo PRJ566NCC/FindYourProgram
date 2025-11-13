@@ -49,6 +49,11 @@ export async function POST(req) {
       ${userPreferences.hasLiving === "Yes" ? `- Living Expense Budget: $${userPreferences.livingBudget} CAD per year` : ""}
       ${userPreferences.priorities && userPreferences.priorities.length > 0 ? `- Priorities: ${userPreferences.priorities.join(", ")}` : ""}
       ${userPreferences.subjects && userPreferences.subjects.length > 0 ? `- Strong Subjects: ${userPreferences.subjects.join(", ")}` : ""}
+
+      *** CRITICAL RULES ***
+      1. **University Only**: Recommend ONLY universities (e.g., U of T, Waterloo, Western, McMaster, etc.). STRICTLY EXCLUDE any Colleges.
+      2. **Name Correction**: If you select "Ryerson University", you MUST output the universityName as "Toronto Metropolitan University".
+      3. **Real Data**: Ensure the program names, faculties, and CITIES are actual and correct.
       
       IMPORTANT REQUIREMENTS:
       - Only recommend programs that ACTUALLY EXIST at real Ontario universities
