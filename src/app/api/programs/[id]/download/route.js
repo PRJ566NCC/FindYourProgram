@@ -45,9 +45,12 @@ export async function GET(req, { params }) {
     decodeURIComponent(id)
   )}`;
 
-  const browser = await launchBrowser();
+  let browser;
 
   try {
+    // IMPORTANT: launch inside try so we can catch Vercel errors too
+    browser = await launchBrowser();
+
     const page = await browser.newPage();
 
     await page.setViewport({
@@ -58,11 +61,23 @@ export async function GET(req, { params }) {
 
     page.setDefaultNavigationTimeout(20000);
 
-    await page.goto(url, {
+    const response = await page.goto(url, {
       waitUntil: "domcontentloaded",
     });
 
-    // Let the logo fail (if needed) so the fallback text renders
+    // If the program page itself 404s, bail out with a clear message
+    if (!response || !response.ok()) {
+      const status = response ? response.status() : "no response";
+      return NextResponse.json(
+        {
+          message: "Failed to generate PDF.",
+          error: `Unexpected status code from program page: ${status}.`,
+        },
+        { status: 500 }
+      );
+    }
+
+    // Let the logo image fail so fallback text appears
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
     await page.emulateMediaType("screen");
@@ -107,10 +122,15 @@ export async function GET(req, { params }) {
   } catch (err) {
     console.error("PDF generation error:", err);
     return NextResponse.json(
-      { message: "Failed to generate PDF." },
+      {
+        message: "Failed to generate PDF.",
+        error: String(err && err.message ? err.message : err),
+      },
       { status: 500 }
     );
   } finally {
-    await browser.close();
+    if (browser) {
+      await browser.close().catch(() => {});
+    }
   }
 }
