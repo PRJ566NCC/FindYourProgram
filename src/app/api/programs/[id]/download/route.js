@@ -3,10 +3,10 @@ export const maxDuration = 60;
 
 import { NextResponse } from "next/server";
 
-// LOCAL ONLY
+// Local dev
 import puppeteer from "puppeteer";
 
-// VERCEL ONLY
+// Vercel
 import chromium from "@sparticuz/chromium";
 import puppeteerCore from "puppeteer-core";
 
@@ -58,31 +58,11 @@ export async function GET(req, { params }) {
 
     page.setDefaultNavigationTimeout(20000);
 
-    const response = await page.goto(url, {
+    await page.goto(url, {
       waitUntil: "domcontentloaded",
     });
 
-    if (!response || !response.ok()) {
-      return new NextResponse(
-        JSON.stringify({
-          message: "Failed to generate PDF.",
-          error: `Unexpected status code: ${response?.status() ?? "no response"}.`,
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    // Ensure all web fonts are fully loaded so text layout matches browser
-    await page.evaluate(async () => {
-      if (document.fonts && document.fonts.ready) {
-        await document.fonts.ready;
-      }
-    });
-
-    // Small delay so broken logo image can fail and fallback text appears
+    // Let the logo fail (if needed) so the fallback text renders
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
     await page.emulateMediaType("screen");
@@ -124,6 +104,12 @@ export async function GET(req, { params }) {
         "Content-Disposition": `attachment; filename="program.pdf"`,
       },
     });
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    return NextResponse.json(
+      { message: "Failed to generate PDF." },
+      { status: 500 }
+    );
   } finally {
     await browser.close();
   }
