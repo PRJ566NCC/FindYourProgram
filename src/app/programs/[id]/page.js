@@ -4,6 +4,61 @@ import { useParams, useRouter } from "next/navigation";
 import styles from "@/app/globals.module.css";
 import FavoriteButton from "@/components/FavoriteButton";
 
+function StarIcon({ size = 16, filled = false, color = "#FFD700" }) {
+  const fill = filled ? color : "none";
+  const stroke = filled ? color : "#ccc";
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      style={{ display: "inline-block", verticalAlign: "middle" }}
+    >
+      <path
+        d="M12 2l2.9 6.1 6.7.9-4.8 4.6 1.2 6.7L12 17.8 6 20.3l1.2-6.7-4.8-4.6 6.7-.9z"
+        fill={fill}
+        stroke={stroke}
+        strokeWidth="1"
+      />
+    </svg>
+  );
+}
+
+function DownloadIcon({ size = 16 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      style={{ display: "inline-block", verticalAlign: "middle" }}
+    >
+      <path
+        d="M12 3v10.59l3.3-3.3 1.4 1.42L12 17.41l-4.7-4.7 1.4-1.42L11 13.59V3h2zM5 19h14v2H5z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function BackArrowIcon({ size = 18 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      style={{ display: "inline-block", verticalAlign: "middle" }}
+    >
+      <path
+        d="M14 7l-5 5 5 5V7z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export default function ProgramDetailPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -107,6 +162,9 @@ export default function ProgramDetailPage() {
     );
   }
 
+  const resolvedProgramId =
+    program.programId || program._id || decodeURIComponent(id);
+
   return (
     <div
       style={{
@@ -132,9 +190,13 @@ export default function ProgramDetailPage() {
             fontSize: "1.2rem",
             cursor: "pointer",
             color: "#333",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
           }}
         >
-          ← Back to search results
+          <BackArrowIcon />
+          <span>Back to search results</span>
         </button>
       </div>
 
@@ -195,7 +257,8 @@ export default function ProgramDetailPage() {
             disabled={hasRated}
             onClick={!hasRated ? () => setIsRatingOpen(true) : undefined}
           >
-            {hasRated ? "Rated ⭐" : "Rate ⭐"}
+            <StarIcon size={16} filled color="#ffb400" />
+            <span>{hasRated ? "Rated" : "Rate"}</span>
           </button>
           {ratingCount > 0 && (
             <div
@@ -209,7 +272,8 @@ export default function ProgramDetailPage() {
               }}
             >
               <span>
-                <strong>{rating.toFixed(1)}</strong> / 5 ⭐
+                <strong>{rating.toFixed(1)}</strong> / 5{" "}
+                <StarIcon size={14} filled color="#ffb400" />
               </span>
               <span>
                 {ratingCount} {ratingCount === 1 ? "rating" : "ratings"}
@@ -228,19 +292,18 @@ export default function ProgramDetailPage() {
               alignItems: "center",
               gap: "8px",
             }}
-             onClick={() => {
-    const theId =
-      (typeof program !== "undefined" && (program._id || program.programId)) ||
-      idFromUrl;
-
-    if (!theId) {
-      alert("Missing program id");
-      return;
-    }
-    window.location.href = `/api/programs/${encodeURIComponent(theId)}/download`;
-  }}
+            onClick={() => {
+              if (!resolvedProgramId) {
+                alert("Missing program id");
+                return;
+              }
+              window.location.href = `/api/programs/${encodeURIComponent(
+                resolvedProgramId
+              )}/download`;
+            }}
           >
-            PDF ⬇
+            <DownloadIcon size={16} />
+            <span>PDF</span>
           </button>
         </div>
       </div>
@@ -434,8 +497,7 @@ export default function ProgramDetailPage() {
             <h2>Rate this Program</h2>
 
             <p style={{ margin: "10px 0", color: "#555" }}>
-              Current Rating:{" "}
-              <strong>{rating.toFixed(1)} / 5</strong> (
+              Current Rating: <strong>{rating.toFixed(1)} / 5</strong> (
               {ratingCount} {ratingCount === 1 ? "rating" : "ratings"})
             </p>
 
@@ -453,15 +515,17 @@ export default function ProgramDetailPage() {
                   style={{
                     fontSize: "2rem",
                     cursor: "pointer",
-                    color:
-                      (hover || userRating) >= star ? "#FFD700" : "#ccc",
                     transition: "color 0.2s",
                   }}
                   onClick={() => setUserRating(star)}
                   onMouseEnter={() => setHover(star)}
                   onMouseLeave={() => setHover(0)}
                 >
-                  ★
+                  <StarIcon
+                    size={32}
+                    filled={(hover || userRating) >= star}
+                    color="#FFD700"
+                  />
                 </span>
               ))}
             </div>
