@@ -228,6 +228,17 @@ export default function ProgramDetailPage() {
               alignItems: "center",
               gap: "8px",
             }}
+             onClick={() => {
+    const theId =
+      (typeof program !== "undefined" && (program._id || program.programId)) ||
+      idFromUrl;
+
+    if (!theId) {
+      alert("Missing program id");
+      return;
+    }
+    window.location.href = `/api/programs/${encodeURIComponent(theId)}/download`;
+  }}
           >
             PDF ⬇
           </button>
