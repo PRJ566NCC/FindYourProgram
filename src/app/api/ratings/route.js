@@ -1,8 +1,20 @@
-// app/api/ratings/route.js
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "../../../lib/mongodb";
+import jwt from "jsonwebtoken";
 
-// --- POST: add new rating ---
+const JWT_SECRET = process.env.JWT_SECRET;
+
+function getIdentity(req) {
+  const token = req.cookies.get("auth_token")?.value;
+  if (!token || !JWT_SECRET) return null;
+  try {
+    const d = jwt.verify(token, JWT_SECRET);
+    return { userId: d.userId || d.sub, username: d.username || null };
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -15,18 +27,40 @@ export async function POST(req) {
       );
     }
 
+    const identity = getIdentity(req);
+    if (!identity?.userId) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     const { db } = await connectToDatabase();
 
-    // ✅ Store new rating
+    const existing = await db.collection("ratings").findOne({
+      programName,
+      universityName,
+      location,
+      userId: identity.userId,
+    });
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "You have already rated this program." },
+        { status: 400 }
+      );
+    }
+
     await db.collection("ratings").insertOne({
       programName,
       universityName,
       location,
       rating,
+      userId: identity.userId,
+      username: identity.username || null,
       createdAt: new Date(),
     });
 
-    // ✅ Recalculate average
     const ratings = await db
       .collection("ratings")
       .find({ programName, universityName, location })
@@ -46,7 +80,6 @@ export async function POST(req) {
   }
 }
 
-// --- GET: fetch average rating ---
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -69,15 +102,36 @@ export async function GET(req) {
       .toArray();
 
     if (ratings.length === 0) {
-      return NextResponse.json({ rating: 0, count: 0 });
+      return NextResponse.json({
+        rating: 0,
+        count: 0,
+        userHasRated: false,
+        userRating: null,
+      });
     }
 
     const avgRating =
       ratings.reduce((sum, r) => sum + (r.rating || 0), 0) / ratings.length;
 
+    const identity = getIdentity(req);
+    let userHasRated = false;
+    let userRating = null;
+
+    if (identity?.userId) {
+      const userRatingDoc = ratings.find(
+        (r) => r.userId === identity.userId
+      );
+      if (userRatingDoc) {
+        userHasRated = true;
+        userRating = userRatingDoc.rating || null;
+      }
+    }
+
     return NextResponse.json({
       rating: avgRating,
       count: ratings.length,
+      userHasRated,
+      userRating,
     });
   } catch (err) {
     console.error("Error in GET /api/ratings:", err);
