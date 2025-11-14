@@ -3,33 +3,35 @@ export const maxDuration = 60;
 
 import { NextResponse } from "next/server";
 
-// LOCAL ONLY
+// Local dev: full Puppeteer (bundled Chrome)
 import puppeteer from "puppeteer";
 
-// VERCEL ONLY
+// Vercel prod: puppeteer-core + Sparticuz Chromium
 import chromium from "@sparticuz/chromium";
 import puppeteerCore from "puppeteer-core";
 
-// A clean, reliable environment check
 const isVercel = !!process.env.VERCEL;
 
 async function launchBrowser() {
   if (!isVercel) {
-    // LOCAL DEVELOPMENT (Windows / macOS / Linux)
+    // LOCAL (works like your original code)
     return puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
   }
 
-  // PRODUCTION (Vercel): use serverless Chromium
+  // VERCEL (serverless): use Chromium from @sparticuz/chromium
+  // Version 141 bundles its own binary, no remote pack URL needed.
   chromium.setHeadlessMode = true;
   chromium.setGraphicsMode = false;
 
+  const executablePath = await chromium.executablePath();
+
   return puppeteerCore.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
+    args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
     defaultViewport: chromium.defaultViewport,
+    executablePath,
     headless: chromium.headless,
   });
 }
@@ -37,15 +39,21 @@ async function launchBrowser() {
 export async function GET(req, { params }) {
   const { id } = params || {};
   if (!id) {
-    return NextResponse.json({ message: "Program ID is required." }, { status: 400 });
+    return NextResponse.json(
+      { message: "Program ID is required." },
+      { status: 400 }
+    );
   }
 
   const { origin } = new URL(req.url);
-  const url = `${origin}/programs/${encodeURIComponent(decodeURIComponent(id))}`;
+  const url = `${origin}/programs/${encodeURIComponent(
+    decodeURIComponent(id)
+  )}`;
 
-  const browser = await launchBrowser();
+  let browser;
 
   try {
+    browser = await launchBrowser();
     const page = await browser.newPage();
 
     await page.setViewport({
@@ -60,7 +68,7 @@ export async function GET(req, { params }) {
       waitUntil: "domcontentloaded",
     });
 
-    // Give the broken logo image time to fail → fallback text shows
+    // Let the image fail, so your fallback logo text shows
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
     await page.emulateMediaType("screen");
@@ -102,8 +110,17 @@ export async function GET(req, { params }) {
         "Content-Disposition": `attachment; filename="program.pdf"`,
       },
     });
-
+  } catch (err) {
+    console.error("Error generating PDF:", err);
+    return NextResponse.json(
+      { message: "Failed to generate PDF." },
+      { status: 500 }
+    );
   } finally {
-    await browser.close();
+    if (browser) {
+      try {
+        await browser.close();
+      } catch {}
+    }
   }
 }
