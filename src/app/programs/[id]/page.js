@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import styles from "@/app/globals.module.css";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export default function ProgramDetailPage() {
   const { id } = useParams();
@@ -175,21 +176,9 @@ export default function ProgramDetailPage() {
             alignItems: "center",
           }}
         >
-          <button
-            style={{
-              padding: "10px 24px",
-              background: "white",
-              border: "2px solid #333",
-              borderRadius: "8px",
-              fontSize: "1rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            Favorite ♡
-          </button>
+          <FavoriteButton
+            programId={program.programId || decodeURIComponent(id)}
+          />
           <button
             style={{
               padding: "10px 24px",
