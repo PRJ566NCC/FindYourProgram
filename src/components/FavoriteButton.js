@@ -28,17 +28,35 @@ export default function FavoriteButton({ programId }) {
   const [err, setErr] = useState("");
 
   useEffect(() => {
+    if (!programId) return;
+
+    let cancelled = false;
+
     (async () => {
-      const res = await fetch(`/api/favorites/${encodeURIComponent(programId)}`);
-      const data = await res.json();
-      setIsFav(!!data.isFav);
+      try {
+        const res = await fetch(
+          `/api/favorites/${encodeURIComponent(programId)}`
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled) {
+          setIsFav(!!data.isFav);
+        }
+      } catch (e) {
+        console.error("Error loading favorite status:", e);
+      }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [programId]);
 
   const toggle = async () => {
-    if (busy) return;
+    if (busy || !programId) return;
     setBusy(true);
     setErr("");
+
     try {
       if (isFav) {
         await fetch(`/api/favorites/${encodeURIComponent(programId)}`, {
@@ -52,10 +70,15 @@ export default function FavoriteButton({ programId }) {
           body: JSON.stringify({ programId }),
         });
         const data = await res.json();
-        if (res.status === 403)
+        if (res.status === 403) {
           setErr(data.message || "Favorites limit reached (10).");
-        else setIsFav(true);
+        } else {
+          setIsFav(true);
+        }
       }
+    } catch (e) {
+      console.error("Error toggling favorite:", e);
+      setErr("Could not update favorite.");
     } finally {
       setBusy(false);
     }
