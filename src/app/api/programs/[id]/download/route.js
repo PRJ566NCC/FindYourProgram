@@ -1,49 +1,49 @@
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 import { NextResponse } from "next/server";
-import chromium from "@sparticuz/chromium";
-import puppeteerCore from "puppeteer-core";
+
+// LOCAL ONLY
 import puppeteer from "puppeteer";
 
-async function getBrowser() {
-  const isProd = process.env.VERCEL_ENV === "production";
+// VERCEL ONLY
+import chromium from "@sparticuz/chromium";
+import puppeteerCore from "puppeteer-core";
 
-  if (isProd) {
-    const executablePath = await chromium.executablePath();
+// A clean, reliable environment check
+const isVercel = !!process.env.VERCEL;
 
-    return puppeteerCore.launch({
-      args: chromium.args,
-      defaultViewport: {
-        width: 1400,
-        height: 900,
-        deviceScaleFactor: 1,
-      },
-      executablePath,
-      headless: chromium.headless,
+async function launchBrowser() {
+  if (!isVercel) {
+    // LOCAL DEVELOPMENT (Windows / macOS / Linux)
+    return puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
   }
 
-  return puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    headless: "new",
+  // PRODUCTION (Vercel): use serverless Chromium
+  chromium.setHeadlessMode = true;
+  chromium.setGraphicsMode = false;
+
+  return puppeteerCore.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath(),
+    defaultViewport: chromium.defaultViewport,
+    headless: chromium.headless,
   });
 }
 
 export async function GET(req, { params }) {
   const { id } = params || {};
   if (!id) {
-    return NextResponse.json(
-      { message: "Program ID is required." },
-      { status: 400 }
-    );
+    return NextResponse.json({ message: "Program ID is required." }, { status: 400 });
   }
 
   const { origin } = new URL(req.url);
-  const url = `${origin}/programs/${encodeURIComponent(
-    decodeURIComponent(id)
-  )}`;
+  const url = `${origin}/programs/${encodeURIComponent(decodeURIComponent(id))}`;
 
-  const browser = await getBrowser();
+  const browser = await launchBrowser();
 
   try {
     const page = await browser.newPage();
@@ -54,13 +54,14 @@ export async function GET(req, { params }) {
       deviceScaleFactor: 1,
     });
 
-    page.setDefaultNavigationTimeout(15000);
+    page.setDefaultNavigationTimeout(20000);
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // Give the broken logo image time to fail → fallback text shows
+    await new Promise((resolve) => setTimeout(resolve, 1200));
 
     await page.emulateMediaType("screen");
 
@@ -71,11 +72,9 @@ export async function GET(req, { params }) {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
-
           header, nav {
             display: none !important;
           }
-
           a[href]::after {
             content: "" !important;
           }
@@ -100,9 +99,10 @@ export async function GET(req, { params }) {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="program.pdf"',
+        "Content-Disposition": `attachment; filename="program.pdf"`,
       },
     });
+
   } finally {
     await browser.close();
   }
