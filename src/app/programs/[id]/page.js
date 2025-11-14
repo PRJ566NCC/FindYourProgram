@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import styles from "@/app/globals.module.css";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export default function ProgramDetailPage() {
   const { id } = useParams();
@@ -12,12 +13,12 @@ export default function ProgramDetailPage() {
   const [logoError, setLogoError] = useState(false);
 
   const [isRatingOpen, setIsRatingOpen] = useState(false);
-  const [rating, setRating] = useState(0); // average rating
-  const [ratingCount, setRatingCount] = useState(0); // total number of ratings
-  const [userRating, setUserRating] = useState(0); // current user rating
+  const [rating, setRating] = useState(0);
+  const [ratingCount, setRatingCount] = useState(0);
+  const [userRating, setUserRating] = useState(0);
   const [hover, setHover] = useState(0);
+  const [hasRated, setHasRated] = useState(false);
 
-  // Fetch program details
   useEffect(() => {
     if (!id) return;
 
@@ -42,7 +43,6 @@ export default function ProgramDetailPage() {
     })();
   }, [id]);
 
-  // Fetch average rating + count
   async function fetchRating() {
     if (!program) return;
     try {
@@ -60,6 +60,14 @@ export default function ProgramDetailPage() {
         const data = await res.json();
         setRating(data.rating || 0);
         setRatingCount(data.count || 0);
+        if (typeof data.userHasRated === "boolean") {
+          setHasRated(data.userHasRated);
+        } else {
+          setHasRated(false);
+        }
+        if (data.userRating) {
+          setUserRating(data.userRating);
+        }
       }
     } catch (err) {
       console.error("Error loading rating:", err);
@@ -165,39 +173,49 @@ export default function ProgramDetailPage() {
           style={{
             display: "flex",
             gap: "12px",
+            alignItems: "center",
           }}
         >
+          <FavoriteButton
+            programId={program.programId || decodeURIComponent(id)}
+          />
           <button
             style={{
               padding: "10px 24px",
-              background: "white",
+              background: hasRated ? "#ddd" : "white",
               border: "2px solid #333",
               borderRadius: "8px",
               fontSize: "1rem",
-              cursor: "pointer",
+              cursor: hasRated ? "not-allowed" : "pointer",
               display: "flex",
               alignItems: "center",
               gap: "8px",
+              opacity: hasRated ? 0.7 : 1,
             }}
+            disabled={hasRated}
+            onClick={!hasRated ? () => setIsRatingOpen(true) : undefined}
           >
-            Favorite ♡
+            {hasRated ? "Rated ⭐" : "Rate ⭐"}
           </button>
-          <button
-            style={{
-              padding: "10px 24px",
-              background: "white",
-              border: "2px solid #333",
-              borderRadius: "8px",
-              fontSize: "1rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-            onClick={() => setIsRatingOpen(true)}
-          >
-            Rate ⭐
-          </button>
+          {ratingCount > 0 && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "center",
+                fontSize: "0.9rem",
+                color: "#333",
+              }}
+            >
+              <span>
+                <strong>{rating.toFixed(1)}</strong> / 5 ⭐
+              </span>
+              <span>
+                {ratingCount} {ratingCount === 1 ? "rating" : "ratings"}
+              </span>
+            </div>
+          )}
           <button
             style={{
               padding: "10px 24px",
@@ -387,7 +405,6 @@ export default function ProgramDetailPage() {
         </div>
       </div>
 
-      {/* ⭐ Rating Modal */}
       {isRatingOpen && (
         <div
           style={{
@@ -472,7 +489,7 @@ export default function ProgramDetailPage() {
                     });
 
                     if (!res.ok) throw new Error("Failed to submit rating");
-                    await fetchRating(); // refresh average/count
+                    await fetchRating();
                   } catch (err) {
                     console.error("Error saving rating:", err);
                     alert("Error saving rating.");

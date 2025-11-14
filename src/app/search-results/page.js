@@ -2,9 +2,15 @@
 
 "use client";
 import { useSearch } from "@/context/SearchContext";
-import MapPin from "@/components/MapPin";
+import dynamic from "next/dynamic";
 import styles from "@/app/globals.module.css";
 import Link from "next/link";
+
+// Load MapPin only on the client (no SSR)
+const MapPin = dynamic(() => import("@/components/MapPin"), {
+  ssr: false,
+});
+
 
 const getPercentageStyle = (percentage) => {
   if (percentage > 89) {
