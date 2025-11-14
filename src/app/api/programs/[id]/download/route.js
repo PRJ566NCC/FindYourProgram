@@ -3,30 +3,30 @@ export const maxDuration = 60;
 
 import { NextResponse } from "next/server";
 
-// Local dev: full Puppeteer (bundled Chrome)
+// Local development: full Puppeteer (bundled Chrome)
 import puppeteer from "puppeteer";
 
-// Vercel prod: puppeteer-core + Sparticuz Chromium
-import chromium from "@sparticuz/chromium";
+// Vercel production: puppeteer-core + remote Chromium pack
+import chromium from "@sparticuz/chromium-min";
 import puppeteerCore from "puppeteer-core";
 
 const isVercel = !!process.env.VERCEL;
 
+// official pack URL for v141 (matches your chromium version)
+const CHROMIUM_PACK_URL =
+  "https://github.com/Sparticuz/chromium/releases/download/v141.0.0/chromium-v141.0.0-pack.tar";
+
 async function launchBrowser() {
   if (!isVercel) {
-    // LOCAL (works like your original code)
+    // LOCAL: same behaviour you already had
     return puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
   }
 
-  // VERCEL (serverless): use Chromium from @sparticuz/chromium
-  // Version 141 bundles its own binary, no remote pack URL needed.
-  chromium.setHeadlessMode = true;
-  chromium.setGraphicsMode = false;
-
-  const executablePath = await chromium.executablePath();
+  // VERCEL: use remote pack so we don't depend on a local bin folder
+  const executablePath = await chromium.executablePath(CHROMIUM_PACK_URL);
 
   return puppeteerCore.launch({
     args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
@@ -68,7 +68,7 @@ export async function GET(req, { params }) {
       waitUntil: "domcontentloaded",
     });
 
-    // Let the image fail, so your fallback logo text shows
+    // Let the logo image fail so your fallback text appears
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
     await page.emulateMediaType("screen");
@@ -112,15 +112,18 @@ export async function GET(req, { params }) {
     });
   } catch (err) {
     console.error("Error generating PDF:", err);
+    // expose message during debugging; you can revert to generic later if you want
     return NextResponse.json(
-      { message: "Failed to generate PDF." },
+      { message: "Failed to generate PDF.", error: String(err?.message || err) },
       { status: 500 }
     );
   } finally {
     if (browser) {
       try {
         await browser.close();
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
   }
 }
