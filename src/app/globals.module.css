@@ -1,3 +1,4 @@
+@import "leaflet/dist/leaflet.css";
 @import url('https://fonts.cdnfonts.com/css/jetbrains-mono');
 html, body {
     height: 100%; 
@@ -614,7 +615,7 @@ html, body {
     display: flex;
     gap: 100px; 
     width: 90%; 
-    max-width: 1200px;
+    max-width: 1500px;
     margin: 28px auto; 
     padding: 28px 0; 
     align-items: center; 
@@ -643,7 +644,7 @@ html, body {
     background-color: #f7d2d2; 
     border-radius: 20px;
     padding: 28px 30px;
-    margin: 28px 0;
+    margin: 28px 30px;
     box-shadow: 0 1px 0 rgba(0,0,0,.25);
     min-height: 140px;
     position: relative; 
@@ -654,7 +655,7 @@ html, body {
 
 .searchResultsCardContent {
     flex-grow: 1; 
-    padding-right: 20px;
+    padding-right: 110px;
     position: relative; 
 }
 
