@@ -30,46 +30,23 @@ export default function FavoriteButton({ programId }) {
   useEffect(() => {
     if (!programId) return;
 
-    let cancelled = false;
-
     (async () => {
       try {
         const res = await fetch(
           `/api/favorites/${encodeURIComponent(programId)}`,
-          {
-            credentials: "include",
-            cache: "no-store",
-          }
+          { cache: "no-store" }
         );
-
-        if (!res.ok) {
-          if (!cancelled) {
-            setErr(`Could not load favorite status (${res.status})`);
-          }
-          return;
-        }
-
+        if (!res.ok) return;
         const data = await res.json();
-        if (!cancelled) {
-          setIsFav(!!data.isFav);
-          setErr("");
-        }
+        setIsFav(!!data.isFav);
       } catch (e) {
         console.error("Error loading favorite status:", e);
-        if (!cancelled) {
-          setErr("Could not load favorite status.");
-        }
       }
     })();
-
-    return () => {
-      cancelled = true;
-    };
   }, [programId]);
 
   const toggle = async () => {
     if (busy || !programId) return;
-
     setBusy(true);
     setErr("");
 
@@ -77,28 +54,20 @@ export default function FavoriteButton({ programId }) {
       if (isFav) {
         const res = await fetch(
           `/api/favorites/${encodeURIComponent(programId)}`,
-          {
-            method: "DELETE",
-            credentials: "include",
-          }
+          { method: "DELETE" }
         );
-
         if (!res.ok) {
           setErr(`Failed to remove favorite (${res.status})`);
           return;
         }
-
         setIsFav(false);
       } else {
         const res = await fetch("/api/favorites", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ programId }),
         });
-
         const data = await res.json();
-
         if (res.status === 403) {
           setErr(data.message || "Favorites limit reached (10).");
         } else if (!res.ok) {
