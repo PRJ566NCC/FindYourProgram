@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^141.0.0",
     "@stripe/react-stripe-js": "^4.0.2",
     "@stripe/stripe-js": "^7.9.0",
     "bcryptjs": "^3.0.2",
@@ -21,6 +22,7 @@
     "nodemailer": "^7.0.9",
     "pdfkit": "^0.17.2",
     "puppeteer": "^24.29.1",
+    "puppeteer-core": "^24.30.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-leaflet": "^5.0.0",

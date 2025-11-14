@@ -1,7 +1,33 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
+import chromium from "@sparticuz/chromium";
+import puppeteerCore from "puppeteer-core";
 import puppeteer from "puppeteer";
+
+async function getBrowser() {
+  const isProd = process.env.VERCEL_ENV === "production";
+
+  if (isProd) {
+    const executablePath = await chromium.executablePath();
+
+    return puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: {
+        width: 1400,
+        height: 900,
+        deviceScaleFactor: 1,
+      },
+      executablePath,
+      headless: chromium.headless,
+    });
+  }
+
+  return puppeteer.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    headless: "new",
+  });
+}
 
 export async function GET(req, { params }) {
   const { id } = params || {};
@@ -17,10 +43,7 @@ export async function GET(req, { params }) {
     decodeURIComponent(id)
   )}`;
 
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    headless: "new",
-  });
+  const browser = await getBrowser();
 
   try {
     const page = await browser.newPage();
@@ -37,8 +60,6 @@ export async function GET(req, { params }) {
       waitUntil: "domcontentloaded",
     });
 
-    // Wait a bit so the image has time to fail
-    // and the fallback logo text can render
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     await page.emulateMediaType("screen");

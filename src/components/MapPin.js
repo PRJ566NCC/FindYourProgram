@@ -97,7 +97,7 @@ export default function MapPin({ lat, lng, name }) {
 
             <MapContainer
               center={[lat, lng]}
-              zoom={17}
+              zoom={16}
               style={{ height: "100%", width: "100%" }}
               scrollWheelZoom={true}
             >
