@@ -1,136 +1,110 @@
-export const runtime = "nodejs";
-export const maxDuration = 60;
+"use client";
+import { useEffect, useState } from "react";
 
-import { NextResponse } from "next/server";
-
-// Local dev
-import puppeteer from "puppeteer";
-
-// Vercel
-import chromium from "@sparticuz/chromium";
-import puppeteerCore from "puppeteer-core";
-
-const isVercel = !!process.env.VERCEL;
-
-async function launchBrowser() {
-  if (!isVercel) {
-    return puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-  }
-
-  chromium.setHeadlessMode = true;
-  chromium.setGraphicsMode = false;
-
-  return puppeteerCore.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
-    defaultViewport: chromium.defaultViewport,
-    headless: chromium.headless,
-  });
+function HeartIcon({ size = 18, filled = false }) {
+  const fill = filled ? "#e63946" : "none";
+  const stroke = "#e63946";
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      style={{ display: "inline-block", verticalAlign: "middle" }}
+    >
+      <path
+        d="M12 21s-5.2-3.2-8-6.1C2.1 13 1.5 11.7 1.5 10.2 1.5 7.9 3.2 6 5.4 6c1.5 0 2.8.9 3.6 2.1C10.8 6.9 12.1 6 13.6 6c2.2 0 3.9 1.9 3.9 4.2 0 1.5-.6 2.8-2.5 4.7-2.8 2.9-8 6.1-8 6.1z"
+        fill={fill}
+        stroke={stroke}
+        strokeWidth="1"
+      />
+    </svg>
+  );
 }
 
-export async function GET(req, { params }) {
-  const { id } = params || {};
-  if (!id) {
-    return NextResponse.json(
-      { message: "Program ID is required." },
-      { status: 400 }
-    );
-  }
+export default function FavoriteButton({ programId }) {
+  const [isFav, setIsFav] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
-  const { origin } = new URL(req.url);
-  const url = `${origin}/programs/${encodeURIComponent(
-    decodeURIComponent(id)
-  )}`;
+  useEffect(() => {
+    (async () => {
+      const res = await fetch(`/api/favorites/${encodeURIComponent(programId)}`);
+      const data = await res.json();
+      setIsFav(!!data.isFav);
+    })();
+  }, [programId]);
 
-  let browser;
-
-  try {
-    // IMPORTANT: launch inside try so we can catch Vercel errors too
-    browser = await launchBrowser();
-
-    const page = await browser.newPage();
-
-    await page.setViewport({
-      width: 1400,
-      height: 900,
-      deviceScaleFactor: 1,
-    });
-
-    page.setDefaultNavigationTimeout(20000);
-
-    const response = await page.goto(url, {
-      waitUntil: "domcontentloaded",
-    });
-
-    // If the program page itself 404s, bail out with a clear message
-    if (!response || !response.ok()) {
-      const status = response ? response.status() : "no response";
-      return NextResponse.json(
-        {
-          message: "Failed to generate PDF.",
-          error: `Unexpected status code from program page: ${status}.`,
-        },
-        { status: 500 }
-      );
+  const toggle = async () => {
+    if (busy) return;
+    setBusy(true);
+    setErr("");
+    try {
+      if (isFav) {
+        await fetch(`/api/favorites/${encodeURIComponent(programId)}`, {
+          method: "DELETE",
+        });
+        setIsFav(false);
+      } else {
+        const res = await fetch("/api/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ programId }),
+        });
+        const data = await res.json();
+        if (res.status === 403)
+          setErr(data.message || "Favorites limit reached (10).");
+        else setIsFav(true);
+      }
+    } finally {
+      setBusy(false);
     }
+  };
 
-    // Let the logo image fail so fallback text appears
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+      }}
+    >
+      <button
+        onClick={toggle}
+        disabled={busy}
+        style={{
+          padding: "10px 24px",
+          background: "white",
+          border: "2px solid #333",
+          borderRadius: "8px",
+          fontSize: "1rem",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
+          height: "44px",
+          lineHeight: "1",
+          fontWeight: "500",
+        }}
+      >
+        <span style={{ color: "#000" }}>
+          {isFav ? "Favorited" : "Favorite"}
+        </span>
+        <HeartIcon filled={isFav} />
+      </button>
 
-    await page.emulateMediaType("screen");
-
-    await page.addStyleTag({
-      content: `
-        @media print {
-          body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          header, nav {
-            display: none !important;
-          }
-          a[href]::after {
-            content: "" !important;
-          }
-        }
-      `,
-    });
-
-    const pdf = await page.pdf({
-      format: "A4",
-      landscape: true,
-      printBackground: true,
-      margin: {
-        top: "10mm",
-        bottom: "10mm",
-        left: "10mm",
-        right: "10mm",
-      },
-      scale: 0.8,
-    });
-
-    return new NextResponse(pdf, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="program.pdf"`,
-      },
-    });
-  } catch (err) {
-    console.error("PDF generation error:", err);
-    return NextResponse.json(
-      {
-        message: "Failed to generate PDF.",
-        error: String(err && err.message ? err.message : err),
-      },
-      { status: 500 }
-    );
-  } finally {
-    if (browser) {
-      await browser.close().catch(() => {});
-    }
-  }
+      {err && (
+        <span
+          style={{
+            color: "crimson",
+            fontSize: "0.85rem",
+            marginTop: "4px",
+          }}
+        >
+          {err}
+        </span>
+      )}
+    </div>
+  );
 }
