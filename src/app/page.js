@@ -32,7 +32,7 @@ export default function Home() {
 function AdminDashboard() {
   return (
     <div className={styles.background}>
-      <div className={styles.authedMain} style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center" }}>
         <h1 className={styles.adminTitle}>Admin Dashboard</h1>
 
         <div className={styles.adminButtonWrapper}>
