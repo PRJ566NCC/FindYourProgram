@@ -709,3 +709,32 @@ html, body {
     font-weight: normal;
     font-family: 'Jetbrains Mono', monospace
 }
+
+.adminTitle {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.adminButtonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 260px;
+  margin: 0 auto;
+}
+
+.adminButton {
+  display: block;
+  background: #4c6ef5;
+  color: white;
+  text-align: center;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.adminButton:hover {
+  background: #3b5bdb;
+}
