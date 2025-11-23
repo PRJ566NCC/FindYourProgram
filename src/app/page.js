@@ -11,21 +11,50 @@ import { useAuth } from "@/components/AuthProvider";
  * Renders landing for unauthenticated users or the signed-in main view.
  */
 export default function Home() {
-  const { isAuthed, loading } = useAuth();
+  const { isAuthed, loading, user } = useAuth();
 
   if (loading) {
     return <div className={styles.pageSkeleton}>Loading…</div>;
   }
 
-  return <>{isAuthed ? <SignedInMain /> : <Landing />}</>;
+  if (!isAuthed) return <Landing />;
+
+  // SHOW ADMIN DASHBOARD IF ADMIN USER
+  if (user?.isAdmin) return <AdminDashboard />;
+
+  return <SignedInMain />;
+}
+
+/**
+ * ADMIN DASHBOARD VIEW
+ * Appears ONLY when user.isAdmin === true
+ */
+function AdminDashboard() {
+  return (
+    <div className={styles.background}>
+      <div className={styles.authedMain} style={{ textAlign: "center" }}>
+        <h1 className={styles.adminTitle}>Admin Dashboard</h1>
+
+        <div className={styles.adminButtonWrapper}>
+          <Link href="/admin/donations" className={styles.adminButton}>
+            Donations
+          </Link>
+
+          <Link href="/admin/sponsorships" className={styles.adminButton}>
+            Sponsorships
+          </Link>
+
+          <Link href="/admin/tickets" className={styles.adminButton}>
+            Tickets
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /**
  * Signed-in view with dynamic sponsorship tiles.
- * Rules:
- *  - Display 0/1/2 sponsor cards from API (already randomized and filtered).
- *  - Only sponsors with status "succeeded" and unexpired `expiresAt`.
- *  - Province text is hardcoded to "Ontario".
  */
 function SignedInMain() {
   const [sponsors, setSponsors] = useState([]);
