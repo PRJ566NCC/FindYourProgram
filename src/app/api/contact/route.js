@@ -10,7 +10,12 @@ export async function POST(req) {
     const type = body?.type;
     const details = body?.details || {};
 
-    if (type !== "bug" && type !== "payment") {
+    if (
+      type !== "bug" &&
+      type !== "payment" &&
+      type !== "refund" &&
+      type !== "partnership"
+    ) {
       return NextResponse.json(
         { message: "Invalid contact type." },
         { status: 400 }

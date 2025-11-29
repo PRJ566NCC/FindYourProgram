@@ -35,14 +35,16 @@ export default function ContactPage() {
     {
       key: "refunds",
       title: "Refunds",
-      description: "Coming soon",
-      disabled: true,
+      description: "Request a refund or ask about a charge.",
+      onClick: () => router.push("/contact/refund"),
+      disabled: false,
     },
     {
       key: "partnership",
       title: "Partnership",
-      description: "Coming soon",
-      disabled: true,
+      description: "Interested in sponsorship or collaboration?",
+      onClick: () => router.push("/contact/partnership"),
+      disabled:false,
     },
   ];
 
