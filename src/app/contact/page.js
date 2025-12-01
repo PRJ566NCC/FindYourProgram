@@ -22,15 +22,17 @@ export default function ContactPage() {
     },
     {
       key: "wrong-info",
-      title: "Wrong Information",
-      description: "Coming soon",
-      disabled: true,
+      title: "Report Wrong Info",
+      description: "Report incorrect data on the site.",
+      onClick: () => router.push("/contact/wrong-info"),
+      disabled: false,
     },
     {
       key: "personal-info",
-      title: "Personal Information",
-      description: "Coming soon",
-      disabled: true,
+      title: "Personal Info Request",
+      description: "Request data removal or updates.",
+      onClick: () => router.push("/contact/personal-info"),
+      disabled: false,
     },
     {
       key: "refunds",
