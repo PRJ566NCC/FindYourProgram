@@ -14,7 +14,9 @@ export async function POST(req) {
       type !== "bug" &&
       type !== "payment" &&
       type !== "refund" &&
-      type !== "partnership"
+      type !== "partnership" &&
+      type !== "wrong-info" && 
+      type !== "personal-info" 
     ) {
       return NextResponse.json(
         { message: "Invalid contact type." },
@@ -24,8 +26,14 @@ export async function POST(req) {
 
     const name = details.name?.trim();
     const email = details.email?.trim();
-    const summary =
-      (details.summary || details.shortSummary || "").trim();
+    
+    let summary = (details.summary || details.shortSummary || "").trim();
+
+    if (type === "wrong-info") {
+        summary = `Correction report for: ${details.targetUrl || "Unknown URL"}`;
+    } else if (type === "personal-info") {
+        summary = details.requestType || "Personal Info Request";
+    }
 
     if (!name || !email || !summary) {
       return NextResponse.json(
@@ -38,12 +46,12 @@ export async function POST(req) {
     const now = new Date();
 
     const doc = {
-      type,           // "bug" or "payment"
-      status: "open", // ticket status
+      type,           
+      status: "open", 
       name,
       email,
       summary,
-      details,        // single subdocument holding all fields
+      details,        
       createdAt: now,
       updatedAt: now,
     };
