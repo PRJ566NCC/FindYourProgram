@@ -6,10 +6,6 @@ import { useEffect, useState } from "react";
 import styles from "./globals.module.css";
 import { useAuth } from "@/components/AuthProvider";
 
-/**
- * Home page.
- * Renders landing for unauthenticated users or the signed-in main view.
- */
 export default function Home() {
   const { isAuthed, loading, user } = useAuth();
 
@@ -19,43 +15,90 @@ export default function Home() {
 
   if (!isAuthed) return <Landing />;
 
-  // SHOW ADMIN DASHBOARD IF ADMIN USER
   if (user?.isAdmin) return <AdminDashboard />;
 
   return <SignedInMain />;
 }
 
-/**
- * ADMIN DASHBOARD VIEW
- * Appears ONLY when user.isAdmin === true
- */
 function AdminDashboard() {
   return (
     <div className={styles.background}>
-      <div style={{ textAlign: "center" }}>
-        <h1 className={styles.adminTitle}>Admin Dashboard</h1>
+      <div className={styles.authedMain}>
+        <div className={styles.logoCol}>
+          <div className={styles.adminLogoStack}>
+            <Image
+              src="/FindYourProgramLogo.png"
+              alt="Find Your Program"
+              width={260}
+              height={260}
+              className={styles.sideLogo}
+            />
+            <p className={styles.adminSubtitle}>
+              Review donations, sponsorships, and student tickets from one place.
+            </p>
+          </div>
+        </div>
 
-        <div className={styles.adminButtonWrapper}>
-          <Link href="/admin/donations" className={styles.adminButton}>
-            Donations
-          </Link>
+        <div className={styles.resultsCol}>
+          <div className={styles.adminHeader}>
+            <h1 className={styles.adminTitle}>Admin Dashboard</h1>
+            <p className={styles.adminTagline}>
+              Quickly jump into the areas you manage most often.
+            </p>
+          </div>
 
-          <Link href="/admin/sponsorships" className={styles.adminButton}>
-            Sponsorships
-          </Link>
+          <div className={styles.adminCardGrid}>
+            <Link href="/admin/donations" className={styles.adminCard}>
+              <div className={styles.adminCardTop}>
+                <span className={styles.adminCardLabel}>Financial</span>
+                <span className={styles.adminCardArrow}>→</span>
+              </div>
+              <h2 className={styles.adminCardTitle}>Donations</h2>
+              <p className={styles.adminCardDescription}>
+                View recent donations, monitor funding trends, and export data
+                for reports.
+              </p>
+              <div className={styles.adminCardFooter}>
+                <span>Open donations panel</span>
+              </div>
+            </Link>
 
-          <Link href="/admin/tickets" className={styles.adminButton}>
-            Tickets
-          </Link>
+            <Link href="/admin/sponsorships" className={styles.adminCard}>
+              <div className={styles.adminCardTop}>
+                <span className={styles.adminCardLabel}>Partners</span>
+                <span className={styles.adminCardArrow}>→</span>
+              </div>
+              <h2 className={styles.adminCardTitle}>Sponsorships</h2>
+              <p className={styles.adminCardDescription}>
+                Manage active sponsorships and see which programs are currently
+                being promoted.
+              </p>
+              <div className={styles.adminCardFooter}>
+                <span>Open sponsorships panel</span>
+              </div>
+            </Link>
+
+            <Link href="/admin/tickets" className={styles.adminCard}>
+              <div className={styles.adminCardTop}>
+                <span className={styles.adminCardLabel}>Support</span>
+                <span className={styles.adminCardArrow}>→</span>
+              </div>
+              <h2 className={styles.adminCardTitle}>Tickets</h2>
+              <p className={styles.adminCardDescription}>
+                Track student and sponsor requests, update statuses, and keep a
+                clear timeline of follow-ups.
+              </p>
+              <div className={styles.adminCardFooter}>
+                <span>Open tickets workspace</span>
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-/**
- * Signed-in view with dynamic sponsorship tiles.
- */
 function SignedInMain() {
   const [sponsors, setSponsors] = useState([]);
   const [loadingSponsors, setLoadingSponsors] = useState(true);
@@ -64,7 +107,9 @@ function SignedInMain() {
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch("/api/sponsorships/active", { cache: "no-store" });
+        const res = await fetch("/api/sponsorships/active", {
+          cache: "no-store",
+        });
         if (!res.ok) throw new Error("Load error");
         const data = await res.json();
         if (mounted && Array.isArray(data?.sponsors)) setSponsors(data.sponsors);
@@ -82,7 +127,6 @@ function SignedInMain() {
   return (
     <div className={styles.background}>
       <div className={styles.authedMain}>
-        {/* Left logo column */}
         <div className={styles.logoCol}>
           <img
             src="/FindYourProgramLogo.png"
@@ -91,14 +135,14 @@ function SignedInMain() {
           />
         </div>
 
-        {/* Right content column */}
         <div className={styles.resultsCol}>
-          {/* Dynamic sponsorship tiles; render nothing when zero */}
           {!loadingSponsors && sponsors.length > 0 && (
             <>
               {sponsors.map((s) => (
                 <div key={s._id} className={styles.resultCard}>
-                  <a className={styles.sponsoredLink} href="#">Sponsored</a>
+                  <a className={styles.sponsoredLink} href="#">
+                    Sponsored
+                  </a>
                   <h3 className={styles.cardTitle}>{s.programName}</h3>
                   <p className={styles.cardMeta}>
                     {s.uniName}
@@ -123,9 +167,6 @@ function SignedInMain() {
   );
 }
 
-/**
- * Landing view for unauthenticated users.
- */
 function Landing() {
   return (
     <div className={styles.landingBackground}>
