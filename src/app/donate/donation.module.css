@@ -1,134 +1,266 @@
-/* Page container */
 .page {
-  background:#e2d6cd;
-  min-height:100vh;
-  padding-bottom:8px;
+  background: #e2d6cd;
+  min-height: 100vh;
+  padding: 24px 0 16px;
 }
 
 /* Two-column layout; right column stacks its cards */
 .grid {
-  display:grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   grid-template-areas: "left right";
-  column-gap:48px;
-  row-gap:0;
-  max-width:1320px;
-  margin:24px auto 0;
-  padding:0 36px;
-  align-items:start;
+  column-gap: 48px;
+  row-gap: 22px;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 36px;
+  align-items: flex-start;
 }
 
 /* Left card */
 .cardLeft {
-  grid-area:left;
-  background:#d3cecb;
-  border:2px solid #9f9b98;
-  padding:0 18px 14px;
-  border-radius:3px;
+  grid-area: left;
+  background: #d3cecb;
+  border: 2px solid #9f9b98;
+  padding: 0 18px 14px;
+  border-radius: 3px;
 }
 
 /* Right column wrapper */
 .rightCol {
-  grid-area:right;
-  display:grid;
-  grid-auto-rows:min-content;
-  row-gap:22px;
+  grid-area: right;
+  display: grid;
+  grid-auto-rows: min-content;
+  row-gap: 22px;
 }
 
 /* Right cards */
 .cardRight,
 .cardBottom {
-  background:#d3cecb;
-  border:2px solid #9f9b98;
-  border-radius:3px;
+  background: #d3cecb;
+  border: 2px solid #9f9b98;
+  border-radius: 3px;
 }
-.cardRight { padding:0 18px 18px; display:flex; flex-direction:column; }
-.cardBottom{ padding:0 18px 14px; }
+
+.cardRight {
+  padding: 0 18px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardBottom {
+  padding: 0 18px 14px;
+}
 
 /* Headers */
-.cardHeader{
-  background:#cfcacc;
-  border-bottom:2px solid #9f9b98;
-  margin:0 -18px 10px;
-  padding:9px 18px;
-  text-align:center;
-  font-weight:800;
-  color:#2b2a2a;
-  font-size:20px;   /* increased from default to make header stand out */
+.cardHeader {
+  background: #cfcacc;
+  border-bottom: 2px solid #9f9b98;
+  margin: 0 -18px 10px;
+  padding: 9px 18px;
+  text-align: center;
+  font-weight: 800;
+  color: #2b2a2a;
+  font-size: 20px;
 }
 
-.bottomHeader{
-  background:#cfcacc;
-  border-bottom:2px solid #9f9b98;
-  margin:0 -18px 8px;
-  padding:9px 18px;
-  font-weight:800;
-  color:#2b2a2a;
-  font-size:18px;   /* slightly smaller so hierarchy looks natural */
+.bottomHeader {
+  background: #cfcacc;
+  border-bottom: 2px solid #9f9b98;
+  margin: 0 -18px 8px;
+  padding: 9px 18px;
+  font-weight: 800;
+  color: #2b2a2a;
+  font-size: 18px;
 }
-
-
 
 /* Form rows */
-.formRow   { display:grid; grid-template-columns:190px 1fr; align-items:center; gap:12px; margin-bottom:12px; }
-.formRowCol{ display:grid; grid-template-columns:190px 1fr; gap:12px; margin-bottom:12px; }
+.formRow {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.formRowCol {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
 
 /* Ensure column-2 controls can shrink and use full width */
 .formRow > div,
-.formRowCol > div { width:100%; min-width:0; }   /* min-width:0 prevents overflow in CSS Grid */
-
-/* Labels and inputs (font sizes aligned with other pages) */
-.label{ color:#3a3a3a; font-weight:700; font-size:18px; }
-.input, .textarea, .amountInput{
-  background:#f5f2e5;
-  border:2px solid #bdbab1;
-  padding:12px 14px;
-  border-radius:4px;
-  font-size:16px;                  /* larger field text */
-  line-height:1.35;
-  outline:none;
-  width:100%;
-  display:block;
-  box-sizing:border-box;           /* includes border/padding in width calculation */
+.formRowCol > div {
+  width: 100%;
+  min-width: 0;
 }
 
-/* Taller textareas to balance page length; adjust if needed */
-.formRowCol textarea{ height:128px; }
+/* Labels and inputs */
+.label {
+  color: #3a3a3a;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.input,
+.textarea,
+.amountInput {
+  background: #f5f2e5;
+  border: 2px solid #bdbab1;
+  padding: 12px 14px;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1.35;
+  outline: none;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* Taller textareas */
+.formRowCol textarea {
+  height: 128px;
+}
 
 /* Amount section (right card) */
-.amountBlock{ display:grid; gap:12px; }
-.amountLabel{ color:#8f8f8f; margin-top:4px; font-weight:700; font-size:16px; }
-.amountInputWrap{ display:flex; align-items:center; width:600px; max-width:100%; }
-.dollar{ position:relative; left:12px; z-index:1; font-weight:700; color:#2b2b2b; }
-.amountInput{ width:100%; padding-left:26px; }
+.amountBlock {
+  display: grid;
+  gap: 12px;
+}
+
+.amountLabel {
+  color: #8f8f8f;
+  margin-top: 4px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.amountInputWrap {
+  display: flex;
+  align-items: center;
+  width: 600px;
+  max-width: 100%;
+}
+
+.dollar {
+  position: relative;
+  left: 12px;
+  z-index: 1;
+  font-weight: 700;
+  color: #2b2b2b;
+}
+
+.amountInput {
+  width: 100%;
+  padding-left: 26px;
+}
 
 /* Action button */
-.payButton{
-  display:inline-block; border:none; border-radius:12px; background:#0e0e0f; color:#fff; padding:12px 20px;
-  font-weight:800; cursor:pointer; width:fit-content; font-size:16px;
+.payButton {
+  display: inline-block;
+  border: none;
+  border-radius: 12px;
+  background: #0e0e0f;
+  color: #fff;
+  padding: 12px 20px;
+  font-weight: 800;
+  cursor: pointer;
+  width: fit-content;
+  font-size: 16px;
 }
-.payButton:disabled{ opacity:.7; cursor:not-allowed; }
+
+.payButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
 
 /* Informational text and validation */
-.bottomText{ margin:0; color:#2f2e2e; font-size:16px; }
-.error{ color:#b00020; font-weight:700; }
+.bottomText {
+  margin: 0;
+  color: #2f2e2e;
+  font-size: 16px;
+}
+
+.error {
+  color: #b00020;
+  font-weight: 700;
+}
 
 /* Modal */
-.modalBackdrop{
-  position:fixed; inset:0; background:rgba(0,0,0,.35);
-  display:flex; align-items:center; justify-content:center; z-index:50;
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
 }
-.modalCard{
-  background:#fff; border-radius:8px; padding:20px; width:640px;
-  max-width:95%;
-  box-shadow:0 10px 30px rgba(0,0,0,.25); position:relative;
+
+.modalCard {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  width: 640px;
+  max-width: 95%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  position: relative;
 }
-.modalClose{
-  position:absolute; top:8px; right:8px; border:none; background:transparent; font-size:18px; cursor:pointer;
+
+.modalClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
 }
 
 /* Stripe Elements shell */
-.elementShell{
-  background:#f5f2e5; border:2px solid #bdbab1; padding:10px 12px; border-radius:4px;
-  box-sizing:border-box;
+.elementShell {
+  background: #f5f2e5;
+  border: 2px solid #bdbab1;
+  padding: 10px 12px;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Responsive layout */
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "left"
+      "right";
+    column-gap: 0;
+    row-gap: 24px;
+  }
+
+  .rightCol {
+    row-gap: 18px;
+  }
+}
+
+@media (max-width: 700px) {
+  .grid {
+    padding: 0 16px;
+  }
+
+  .formRow,
+  .formRowCol {
+    grid-template-columns: 1fr;
+  }
+
+  .label {
+    font-size: 16px;
+  }
+
+  .input,
+  .textarea,
+  .amountInput {
+    font-size: 15px;
+  }
 }

@@ -31,8 +31,10 @@ export async function POST(req) {
 
     if (type === "wrong-info") {
         summary = `Correction report for: ${details.targetUrl || "Unknown URL"}`;
+        details.summary = summary;
     } else if (type === "personal-info") {
-        summary = details.requestType || "Personal Info Request";
+        summary = `Personal Info Request for ${details.name}`;;
+        details.summary = summary;
     }
 
     if (!name || !email || !summary) {

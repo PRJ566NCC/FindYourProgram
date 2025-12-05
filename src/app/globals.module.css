@@ -257,7 +257,7 @@ html, body {
 .searchButtonRow {
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  margin-top: -1rem;
 }
 .searchButton {
   padding: 0.8rem 2rem;

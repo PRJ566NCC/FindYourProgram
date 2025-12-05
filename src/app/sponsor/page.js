@@ -12,20 +12,12 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 
-/**
- * Sponsorship page.
- * - CAD only; fixed amount: $200 CAD.
- * - Fields required: uniName, programName, departmentName, email, phone, message.
- * - Initiates a PaymentIntent (server) and confirms in a modal (client).
- * - Creates a sponsorship record and a payment record (payments table is reused system-wide).
- */
 export default function SponsorPage() {
   const stripePromise = useMemo(
     () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY),
     []
   );
 
-  // Fixed amount in cents (CAD)
   const FIXED_AMOUNT_CENTS = 20000;
 
   const [form, setForm] = useState({
@@ -47,18 +39,17 @@ export default function SponsorPage() {
     clientSecret: null,
     amountCents: FIXED_AMOUNT_CENTS,
   });
-  const [confirmation, setConfirmation] = useState(null); // { ok: boolean, message: string }
+  const [confirmation, setConfirmation] = useState(null);
 
-  // Simple validators
   const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const phoneOk = (v) => v.replace(/\D/g, "").length >= 7;
 
-  /** Validates all inputs. */
   const validate = () => {
     const e = {};
     if (!form.uniName.trim()) e.uniName = "University name is required.";
     if (!form.programName.trim()) e.programName = "Program name is required.";
-    if (!form.departmentName.trim()) e.departmentName = "Department name is required.";
+    if (!form.departmentName.trim())
+      e.departmentName = "Department name is required.";
     if (!form.email.trim()) e.email = "Email is required.";
     else if (!emailOk(form.email)) e.email = "Enter a valid email address.";
     if (!form.phone.trim()) e.phone = "Phone number is required.";
@@ -68,13 +59,11 @@ export default function SponsorPage() {
     return Object.keys(e).length === 0;
   };
 
-  /** Local state setter for inputs. */
   const onChange = (e) => {
     const { name, value } = e.target;
     setForm((s) => ({ ...s, [name]: value }));
   };
 
-  /** Starts the payment by creating sponsorship+payment+PaymentIntent on the server. */
   const startPayment = async (e) => {
     e.preventDefault();
     setError("");
@@ -111,7 +100,6 @@ export default function SponsorPage() {
     }
   };
 
-  // Stripe elements style to match inputs
   const elementStyle = {
     style: {
       base: {
@@ -126,7 +114,6 @@ export default function SponsorPage() {
   return (
     <div className={styles.page}>
       <form className={styles.grid} onSubmit={startPayment}>
-        {/* Left: Sponsorship form */}
         <section className={styles.cardLeft}>
           <header className={styles.cardHeader}>Sponsorship form</header>
 
@@ -141,7 +128,9 @@ export default function SponsorPage() {
                 required
                 aria-invalid={!!errors.uniName}
               />
-              {errors.uniName && <div className={styles.error}>{errors.uniName}</div>}
+              {errors.uniName && (
+                <div className={styles.error}>{errors.uniName}</div>
+              )}
             </div>
           </div>
 
@@ -156,7 +145,9 @@ export default function SponsorPage() {
                 required
                 aria-invalid={!!errors.programName}
               />
-              {errors.programName && <div className={styles.error}>{errors.programName}</div>}
+              {errors.programName && (
+                <div className={styles.error}>{errors.programName}</div>
+              )}
             </div>
           </div>
 
@@ -171,7 +162,9 @@ export default function SponsorPage() {
                 required
                 aria-invalid={!!errors.departmentName}
               />
-              {errors.departmentName && <div className={styles.error}>{errors.departmentName}</div>}
+              {errors.departmentName && (
+                <div className={styles.error}>{errors.departmentName}</div>
+              )}
             </div>
           </div>
 
@@ -187,7 +180,9 @@ export default function SponsorPage() {
                 required
                 aria-invalid={!!errors.email}
               />
-              {errors.email && <div className={styles.error}>{errors.email}</div>}
+              {errors.email && (
+                <div className={styles.error}>{errors.email}</div>
+              )}
             </div>
           </div>
 
@@ -203,7 +198,9 @@ export default function SponsorPage() {
                 required
                 aria-invalid={!!errors.phone}
               />
-              {errors.phone && <div className={styles.error}>{errors.phone}</div>}
+              {errors.phone && (
+                <div className={styles.error}>{errors.phone}</div>
+              )}
             </div>
           </div>
 
@@ -219,12 +216,13 @@ export default function SponsorPage() {
                 required
                 aria-invalid={!!errors.message}
               />
-              {errors.message && <div className={styles.error}>{errors.message}</div>}
+              {errors.message && (
+                <div className={styles.error}>{errors.message}</div>
+              )}
             </div>
           </div>
         </section>
 
-        {/* Right: amount + CTA + info */}
         <div className={styles.rightCol}>
           <section className={styles.cardRight}>
             <header className={styles.cardHeader} />
@@ -242,7 +240,11 @@ export default function SponsorPage() {
                 </div>
               </div>
 
-              <button type="submit" className={styles.payButton} disabled={submitting}>
+              <button
+                type="submit"
+                className={styles.payButton}
+                disabled={submitting}
+              >
                 {submitting ? "Preparing…" : "Proceed to pay"}
               </button>
 
@@ -253,14 +255,14 @@ export default function SponsorPage() {
           <section className={styles.cardBottom}>
             <header className={styles.bottomHeader}>Sponsorship policy</header>
             <p className={styles.bottomText}>
-              Sponsorship runs for <strong>4 months</strong> from the payment date. You can 
-              renew your sponsorship after the 4 months period if desired
+              Sponsorship runs for <strong>4 months</strong> from the payment
+              date. You can renew your sponsorship after the 4 months period if
+              desired
             </p>
           </section>
         </div>
       </form>
 
-      {/* Payment modal */}
       {modal.open && (
         <Elements options={{ clientSecret: modal.clientSecret }} stripe={stripePromise}>
           <PayModal
@@ -277,18 +279,12 @@ export default function SponsorPage() {
             paymentId={modal.paymentId}
             clientSecret={modal.clientSecret}
             amountText={`$${(modal.amountCents / 100).toFixed(2)} CAD`}
-            elementStyle={{
-              style: {
-                base: { fontSize: "16px", color: "#2b2b2b", "::placeholder": { color: "#6b6b6b" } },
-                invalid: { color: "#b00020" },
-              },
-            }}
+            elementStyle={elementStyle}
             onConfirmed={(ok, message) => setConfirmation({ ok, message })}
           />
         </Elements>
       )}
 
-      {/* Confirmation overlay */}
       {confirmation && (
         <div className={styles.modalBackdrop}>
           <div className={styles.modalCard}>
@@ -321,11 +317,6 @@ export default function SponsorPage() {
   );
 }
 
-/**
- * Multi-field payment modal using Stripe Elements.
- * - Confirms the PaymentIntent with explicit client secret.
- * - Persists outcome to the payments table and links to sponsorship.
- */
 function PayModal({
   onClose,
   sponsorshipId,
@@ -345,9 +336,12 @@ function PayModal({
     setErr("");
     setPaying(true);
 
-    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: { card: elements.getElement(CardNumberElement) },
-    });
+    const { error, paymentIntent } = await stripe.confirmCardPayment(
+      clientSecret,
+      {
+        payment_method: { card: elements.getElement(CardNumberElement) },
+      }
+    );
 
     const status = paymentIntent?.status;
     const succeeded = !error && status === "succeeded";
@@ -359,7 +353,7 @@ function PayModal({
         body: JSON.stringify({
           sponsorshipId,
           paymentId,
-          outcome: succeeded ? "succeeded" : (status || "failed"),
+          outcome: succeeded ? "succeeded" : status || "failed",
           paymentIntentId: paymentIntent?.id,
           errorMessage: error?.message,
         }),
@@ -367,9 +361,15 @@ function PayModal({
     } catch (_) {}
 
     if (status === "processing") {
-      onConfirmed(false, "Payment is processing with the bank. Please check again shortly.");
+      onConfirmed(
+        false,
+        "Payment is processing with the bank. Please check again shortly."
+      );
     } else if (succeeded) {
-      onConfirmed(true, "Sponsorship payment recorded successfully. Thank you.");
+      onConfirmed(
+        true,
+        "Sponsorship payment recorded successfully. Thank you."
+      );
     } else {
       onConfirmed(false, error?.message || "Payment did not complete.");
     }
@@ -404,12 +404,21 @@ function PayModal({
           </div>
         </div>
 
-        <button className={styles.payButton} onClick={pay} disabled={paying || !stripe || !elements}>
+        <button
+          className={styles.payButton}
+          onClick={pay}
+          disabled={paying || !stripe || !elements}
+        >
           {paying ? "Processing…" : "Pay now"}
         </button>
-        {err ? <div className={styles.error} style={{ marginTop: 8 }}>{err}</div> : null}
+        {err ? (
+          <div className={styles.error} style={{ marginTop: 8 }}>
+            {err}</div>
+        ) : null}
 
-        <button className={styles.modalClose} onClick={onClose}>✕</button>
+        <button className={styles.modalClose} onClick={onClose}>
+          ✕
+        </button>
       </div>
     </div>
   );

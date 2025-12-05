@@ -12,13 +12,6 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 
-/**
- * Donation page.
- * - CAD currency only.
- * - All fields are required.
- * - Initiates a PaymentIntent server-side and confirms it in a modal.
- * - Stores donation and payment records; payments table holds Stripe references.
- */
 export default function DonatePage() {
   const stripePromise = useMemo(
     () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY),
@@ -44,15 +37,11 @@ export default function DonatePage() {
     clientSecret: null,
     amountCents: 0,
   });
-  const [confirmation, setConfirmation] = useState(null); // { ok: boolean, message: string }
+  const [confirmation, setConfirmation] = useState(null);
 
-  // Basic validation helpers
   const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const phoneOk = (v) => v.replace(/\D/g, "").length >= 7;
 
-  /**
-   * Validates all required fields and basic formats.
-   */
   const validateForm = () => {
     const e = {};
     if (!form.name.trim()) e.name = "Name is required.";
@@ -68,9 +57,6 @@ export default function DonatePage() {
     return Object.keys(e).length === 0;
   };
 
-  /**
-   * Handles input changes and normalizes the amount field.
-   */
   const onChange = (e) => {
     const { name, value } = e.target;
     if (name === "amount") {
@@ -81,10 +67,6 @@ export default function DonatePage() {
     }
   };
 
-  /**
-   * Creates donation and payment records and a CAD PaymentIntent.
-   * Opens the payment modal with a client secret for confirmation.
-   */
   const startPayment = async (e) => {
     e.preventDefault();
     setError("");
@@ -122,7 +104,6 @@ export default function DonatePage() {
     }
   };
 
-  // Stripe Element style aligned with form inputs
   const elementStyle = {
     style: {
       base: {
@@ -137,7 +118,6 @@ export default function DonatePage() {
   return (
     <div className={styles.page}>
       <form className={styles.grid} onSubmit={startPayment}>
-        {/* Left: donor information */}
         <section className={styles.cardLeft}>
           <header className={styles.cardHeader}>Donation form</header>
 
@@ -229,7 +209,6 @@ export default function DonatePage() {
           </div>
         </section>
 
-        {/* RIGHT-COLUMN WRAPPER (fixes bottom whitespace) */}
         <div className={styles.rightCol}>
           <section className={styles.cardRight}>
             <header className={styles.cardHeader} />
@@ -275,7 +254,6 @@ export default function DonatePage() {
         </div>
       </form>
 
-      {/* Payment modal */}
       {modal.open && (
         <Elements
           options={{ clientSecret: modal.clientSecret }}
@@ -301,7 +279,6 @@ export default function DonatePage() {
         </Elements>
       )}
 
-      {/* Confirmation overlay */}
       {confirmation && (
         <div className={styles.modalBackdrop}>
           <div className={styles.modalCard}>
@@ -334,11 +311,6 @@ export default function DonatePage() {
   );
 }
 
-/**
- * Payment modal using split Stripe Elements.
- * - Confirms the PaymentIntent with an explicit client secret.
- * - Persists the outcome and references for audit.
- */
 function PayModal({
   onClose,
   donationId,
@@ -373,7 +345,7 @@ function PayModal({
         body: JSON.stringify({
           donationId,
           paymentId,
-          outcome: succeeded ? "succeeded" : (status || "failed"),
+          outcome: succeeded ? "succeeded" : status || "failed",
           paymentIntentId: paymentIntent?.id,
           errorMessage: error?.message,
         }),
