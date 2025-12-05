@@ -257,7 +257,7 @@ html, body {
 .searchButtonRow {
   display: flex;
   justify-content: center;
-  margin-top: -1rem;
+  margin-top: -0.5rem;
 }
 .searchButton {
   padding: 0.8rem 2rem;
@@ -710,31 +710,123 @@ html, body {
     font-family: 'Jetbrains Mono', monospace
 }
 
-.adminTitle {
-  font-size: 2rem;
+.adminHeader {
   margin-bottom: 2rem;
 }
 
-.adminButtonWrapper {
+.adminTitle {
+  font-size: 2.3rem;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.4rem;
+}
+
+.adminTagline {
+  font-size: 1rem;
+  max-width: 460px;
+  line-height: 1.5;
+}
+
+.adminSubtitle {
+  margin-top: 1.5rem;
+  max-width: 260px;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.adminCardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.4rem;
+}
+
+.adminCard {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  width: 260px;
-  margin: 0 auto;
-}
-
-.adminButton {
-  display: block;
-  background: #4c6ef5;
-  color: white;
-  text-align: center;
-  padding: 14px;
-  border-radius: 8px;
-  font-size: 1.2rem;
+  justify-content: space-between;
+  background: #f8edb8;
+  border-radius: 20px;
+  border: 2px solid #000;
+  padding: 20px 22px;
   text-decoration: none;
-  font-weight: 600;
+  color: #000;
+  font-family: "Jetbrains Mono", monospace;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 
-.adminButton:hover {
-  background: #3b5bdb;
+.adminCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45);
+  background: #ffefc7;
 }
+
+.adminCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.adminCardLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid #000;
+  background: #ffffff;
+}
+
+.adminCardArrow {
+  font-size: 1.4rem;
+}
+
+.adminCardTitle {
+  font-size: 1.25rem;
+  margin: 0 0 0.4rem;
+}
+
+.adminCardDescription {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.adminCardFooter {
+  margin-top: 1.2rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.adminContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 3rem;
+  padding: 2rem 2rem 4rem;
+}
+
+.adminLogoBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 250px;
+}
+
+.adminLogo {
+  width: 180px;
+  height: auto;
+}
+
+.adminLogoText {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.adminContentBox {
+  max-width: 750px;
+}
+

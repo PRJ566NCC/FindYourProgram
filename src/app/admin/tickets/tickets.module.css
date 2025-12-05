@@ -1,0 +1,418 @@
+/* Page shell */
+
+.page {
+  min-height: 100vh;
+  background: #e8ded6;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 48px;
+  box-sizing: border-box;
+}
+
+.shell {
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* List page header */
+
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 2.05rem;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  margin-top: 8px;
+  font-size: 0.98rem;
+  opacity: 0.9;
+}
+
+/* Messages */
+
+.error {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #ffe1e1;
+  border: 1px solid #d26a6a;
+  font-size: 0.9rem;
+}
+
+.empty {
+  margin-top: 40px;
+  padding: 24px 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.93);
+  border: 1px dashed #b8a89c;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* Ticket list */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.ticketCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: #fff7c9;
+  border-radius: 22px;
+  border: 1.5px solid #0c0c0c;
+  padding: 16px 20px 18px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.1s ease, box-shadow 0.1s ease,
+    background 0.12s ease;
+}
+
+.ticketCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.4);
+  background: #fff3b4;
+}
+
+.ticketCardTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+
+.ticketType {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #f7efe0;
+  border: 1px solid #0c0c0c;
+}
+
+.ticketTime {
+  margin-left: auto;
+  opacity: 0.75;
+}
+
+.ticketSummary {
+  margin: 11px 0 4px;
+  font-size: 1.12rem;
+}
+
+.ticketMeta {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* Status chips */
+
+.statusChip {
+  padding: 2px 11px;
+  border-radius: 999px;
+  border: 1px solid #0c0c0c;
+  font-size: 0.75rem;
+}
+
+.statusOpen {
+  background: #e1f0ff;
+}
+
+.statusInProgress {
+  background: #ffe8c4;
+}
+
+.statusClosed {
+  background: #dff5dd;
+}
+
+/* Back link */
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+  text-decoration: underline;
+}
+
+/* Detail header */
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.detailTitle {
+  margin: 0 0 6px;
+  font-size: 1.7rem;
+  letter-spacing: 0.02em;
+}
+
+.detailMetaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.94rem;
+  opacity: 0.9;
+}
+
+.dot {
+  opacity: 0.7;
+}
+
+/* Status block on detail page */
+
+.detailStatusBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.statusButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.statusButtonPrimary,
+.statusButtonGhost {
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.86rem;
+  border: 1px solid #0c0c0c;
+  background: #111111;
+  color: #fff7c9;
+  cursor: pointer;
+}
+
+.statusButtonGhost {
+  background: #f7efe0;
+  color: #111111;
+}
+
+.statusButtonPrimary:disabled,
+.statusButtonGhost:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Detail grid: top two cards */
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 4px;
+  padding-bottom: 18px;
+}
+
+.detailCard {
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 20px;
+  border: 1px solid #c9bfb5;
+  padding: 18px 20px 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.sectionTitle {
+  margin: 0 0 12px;
+  font-size: 1.06rem;
+}
+
+/* Small info rows inside detail cards */
+
+.detailRows {
+  display: grid;
+  row-gap: 6px;
+  margin-bottom: 14px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.detailLabel {
+  opacity: 0.7;
+}
+
+.detailValue {
+  text-align: right;
+}
+
+.detailStatusText {
+  font-weight: 500;
+}
+
+/* Details section (dl) */
+
+.detailSection {
+  margin-top: 10px;
+}
+
+.detailSubTitle {
+  font-size: 0.98rem;
+  margin: 0 0 8px;
+}
+
+.detailsList {
+  margin: 0;
+  padding: 0;
+}
+
+.detailPair {
+  margin-bottom: 10px;
+}
+
+.detailLabelDt {
+  font-size: 0.86rem;
+  opacity: 0.78;
+}
+
+.detailValueDd {
+  margin: 2px 0 0;
+  font-size: 0.94rem;
+  white-space: pre-wrap;
+}
+
+/* Generic muted text */
+
+.muted {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Updates panel */
+
+.updatesCard {
+  margin-top: 24px;
+}
+
+.updateList {
+  list-style: none;
+  margin: 4px 0 14px;
+  padding: 0;
+}
+
+.updateItem {
+  padding: 10px 0;
+  border-bottom: 1px solid #e2d7cd;
+}
+
+.updateMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.updateKind {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.updateText {
+  margin: 0;
+  font-size: 0.94rem;
+}
+
+/* New update box */
+
+.newUpdateBox {
+  border-radius: 16px;
+  background: #faf4ec;
+  padding: 10px 12px 12px;
+  margin-top: 6px;
+}
+
+.newUpdateInput {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #c3b5a8;
+  padding: 8px 10px;
+  resize: vertical;
+  font-size: 0.9rem;
+  background: #fff;
+  min-height: 80px;
+}
+
+
+.newUpdateActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.newUpdateButton {
+  border-radius: 999px;
+  border: 1px solid #0c0c0c;
+  padding: 6px 18px;
+  font-size: 0.86rem;
+  background: #111111;
+  color: #fff7c9;
+  cursor: pointer;
+}
+
+.newUpdateButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Responsive tweaks */
+
+@media (max-width: 900px) {
+  .shell {
+    max-width: 100%;
+  }
+
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .detailStatusBlock {
+    align-items: flex-start;
+  }
+
+  .detailHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 32px 12px 36px;
+  }
+
+  .ticketCard {
+    padding: 14px 14px 16px;
+    border-radius: 18px;
+  }
+
+  .detailCard {
+    padding: 16px 14px 18px;
+  }
+
+  .detailTitle {
+    font-size: 1.45rem;
+  }
+}
